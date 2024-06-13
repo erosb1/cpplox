@@ -5,9 +5,10 @@
 
 int main() {
     std::string src = R"str(
-        while (true) {
+        while (true) {?
             print("annoying message")
         }
+        "
     )str";
 
     Lexer lexer{std::string_view(src)};

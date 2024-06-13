@@ -72,8 +72,12 @@ private:
     [[nodiscard]] char PeekNext() const;
     [[nodiscard]] bool IsAtEnd() const;
 
-    // More Specific Functions
+    // Create Tokens
     Token CreateToken(TT type);
+    template <std::size_t N> // Is templated to only allow string literals as arguments (since its unclear who owns the msg)
+    Token CreateErrorToken(const char(&msg)[N]);
+
+    // Read Source Code
     Token ReadNextToken();
     Token ReadNumber();
     Token ReadString();

@@ -58,6 +58,16 @@ Token Lexer::CreateToken(TT type) {
     return {type, sv, cur_line_};
 }
 
+template<std::size_t N>
+Token Lexer::CreateErrorToken(const char(&msg)[N]) {
+    static_assert(N > 0);
+    return {TokenType::ERROR, std::string_view(msg, N - 1), cur_line_};
+}
+
+// Explicit instantiations for known messages
+template Token Lexer::CreateErrorToken<17>(const char(&msg)[17]); // "Invalid Character"
+template Token Lexer::CreateErrorToken<19>(const char(&msg)[19]); // "Unterminated String"
+
 Token Lexer::ReadNextToken() {
     start_index_ = cur_index_;
     char c = Advance();
@@ -106,7 +116,7 @@ Token Lexer::ReadNextToken() {
             return CreateToken(TT::LESS);
         }
         case '"': return ReadString();
-        default: return CreateToken(TT::ERROR);
+        default: return CreateErrorToken("Invalid Character");
     }
 }
 
@@ -130,7 +140,7 @@ Token Lexer::ReadString() {
     }
 
     if (IsAtEnd()) { // If the string never terminated
-        auto token = CreateToken(TT::ERROR);
+        auto token = CreateErrorToken("Unterminated String");
         cur_line_ = ending_line;
         return token;
     }
