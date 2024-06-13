@@ -31,6 +31,34 @@ BOOST_AUTO_TEST_CASE(LexerEmptySourceCode) {
     BOOST_REQUIRE(is_equal);
 }
 
+// Ensure that the Lexer correctly scans single character tokens
+BOOST_AUTO_TEST_CASE(LexerSingleCharTokens) {
+    std::string source_code = "(){},.-+;/*";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expected = {
+        TT::LEFT_PAREN,
+        TT::RIGHT_PAREN,
+        TT::LEFT_BRACE,
+        TT::RIGHT_BRACE,
+        TT::COMMA,
+        TT::DOT,
+        TT::MINUS,
+        TT::PLUS,
+        TT::SEMICOLON,
+        TT::SLASH,
+        TT::STAR,
+        TT::END,
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    bool is_equal = CheckCorrectTokenTypes(tokens, expected);
+
+    // Verify token properties
+    BOOST_REQUIRE(is_equal);
+}
+
 BOOST_AUTO_TEST_CASE(LexerEmptyVarDeclaration) {
     std::string source_code = "var x = 54;";
     Lexer lexer(source_code);

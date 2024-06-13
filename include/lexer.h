@@ -34,9 +34,9 @@ using TT = TokenType;
 struct Token {
     TokenType type;
     std::string_view lexeme;
-    int line;
+    size_t line;
 
-    Token(TokenType type, std::string_view lexeme, int line)
+    Token(TokenType type, std::string_view lexeme, size_t line)
         : type(type), lexeme(lexeme), line(line) {}
 };
 
@@ -51,9 +51,15 @@ private:
     [[nodiscard]] char Peek() const;
     [[nodiscard]] char PeekNext() const;
     [[nodiscard]] bool IsAtEnd() const;
+
+    // More Specific Functions
+    Token CreateToken(TT type);
+    Token ScanNext();
+    void SkipWhitespace();
 private:
     std::string_view source_code_;
     size_t cur_index_;
+    size_t start_index_;
     size_t cur_line_;
 };
 
