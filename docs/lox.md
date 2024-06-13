@@ -63,43 +63,43 @@ DIGIT            :=  "0" ... "9" ;
 
 
 ## Tokens
-| Token Type    | Lexeme    |
-|---------------|-----------|
-| LEFT_PAREN    | (         |
-| RIGHT_PAREN   | )         |
-| LEFT_BRACE    | {         |
-| RIGHT_BRACE   | }         |
-| COMMA         | ,         |
-| DOT           | .         |
-| MINUS         | -         |
-| PLUS          | +         |
-| SEMICOLON     | ;         |
-| SLASH         | /         |
-| STAR          | *         |
-| BANG          | !         |
-| BANG_EQUAL    | !=        |
-| EQUAL         | =         |
-| EQUAL_EQUAL   | ==        |
-| GREATER       | \>        |
-| GREATER_EQUAL | \>=       |
-| LESS          | <         |
-| LESS_EQUAL    | <=        |
-| IDENTIFIER    | <chars>   |
-| STRING        | "<chars>" |
-| NUMBER        | <digits>  |
-| AND           | and       |
-| OR            | or        |
-| TRUE          | true      |
-| FALSE         | false     |
-| FUN           | fun       |
-| IF            | if        |
-| ELSE          | else      |
-| NIL           | nil       |
-| PRINT         | print     |
-| RETURN        | return    |
-| VAR           | var       |
-| WHILE         | while     |
-| ERROR         |           |
-| END           |           |
+| Token Type    | Lexeme     |
+|---------------|------------|
+| LEFT_PAREN    | (          |
+| RIGHT_PAREN   | )          |
+| LEFT_BRACE    | {          |
+| RIGHT_BRACE   | }          |
+| COMMA         | ,          |
+| DOT           | .          |
+| MINUS         | -          |
+| PLUS          | +          |
+| SEMICOLON     | ;          |
+| SLASH         | /          |
+| STAR          | *          |
+| BANG          | !          |
+| BANG_EQUAL    | !=         |
+| EQUAL         | =          |
+| EQUAL_EQUAL   | ==         |
+| GREATER       | \>         |
+| GREATER_EQUAL | \>=        |
+| LESS          | <          |
+| LESS_EQUAL    | <=         |
+| IDENTIFIER    | \<chars>   |
+| STRING        | "\<chars>" |
+| NUMBER        | \<digits>  |
+| AND           | and        |
+| OR            | or         |
+| TRUE          | true       |
+| FALSE         | false      |
+| FUN           | fun        |
+| IF            | if         |
+| ELSE          | else       |
+| NIL           | nil        |
+| PRINT         | print      |
+| RETURN        | return     |
+| VAR           | var        |
+| WHILE         | while      |
+| ERROR         |            |
+| END           |            |
 
 

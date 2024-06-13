@@ -77,10 +77,34 @@ Token Lexer::ScanNext() {
         case ';': return CreateToken(TT::SEMICOLON);
         case '/': return CreateToken(TT::SLASH);
         case '*': return CreateToken(TT::STAR);
-        case '!': return CreateToken(TT::BANG);
-        case '=': return CreateToken(TT::EQUAL);
-        case '>': return CreateToken(TT::GREATER);
-        case '<': return CreateToken(TT::LESS);
+        case '!': {
+            if (Peek() == '=') {
+                Advance();
+                return CreateToken(TT::BANG_EQUAL);
+            }
+            return CreateToken(TT::BANG);
+        }
+        case '=': {
+            if (Peek() == '=') {
+                Advance();
+                return CreateToken(TT::EQUAL_EQUAL);
+            }
+            return CreateToken(TT::EQUAL);
+        }
+        case '>': {
+            if (Peek() == '=') {
+                Advance();
+                return CreateToken(TT::GREATER_EQUAL);
+            }
+            return CreateToken(TT::GREATER);
+        }
+        case '<': {
+            if (Peek() == '=') {
+                Advance();
+                return CreateToken(TT::LESS_EQUAL);
+            }
+            return CreateToken(TT::LESS);
+        }
         case '"': return ReadString();
         default: return CreateToken(TT::ERROR);
     }

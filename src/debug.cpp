@@ -52,12 +52,12 @@ std::ostream& operator<<(std::ostream& os, const TokenType& type) {
 static void PrintToken(const Token& token, size_t last_line_num) {
     std::string line_num_str = token.line == last_line_num ? "| " : std::to_string(token.line) + " ";
     std::string token_type_str = GetTokenString(token.type);
-    std::cout << std::right << std::setw(6)  << line_num_str << std::left << "     " << std::setw(11)
+    std::cout << std::right << std::setw(6)  << line_num_str << std::left << "     " << std::setw(14)
         << token_type_str << "    " << std::setw(8) << token.lexeme << '\n';
 }
 
 void PrintTokens(const std::vector<Token> &tokens) {
-    std::cout << "[line]    [TokenType]    [lexeme]\n";
+    std::cout << "[line]    [TokenType]       [lexeme]\n";
     size_t last_line_num = -1;
     for (auto& token : tokens) {
         PrintToken(token, last_line_num);
