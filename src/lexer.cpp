@@ -10,11 +10,11 @@ Lexer::Lexer(std::string_view source_code)
 std::vector<Token> Lexer::Tokenize() {
     std::vector<Token> tokens;
     while (true) {
-        tokens.push_back(ScanNext());
         if (IsAtEnd()) {
             tokens.push_back(CreateToken(TT::END));
             break;
         }
+        tokens.push_back(ScanNext());
     }
     return tokens;
 }

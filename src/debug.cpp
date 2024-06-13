@@ -44,6 +44,11 @@ static std::string GetTokenString(TokenType type) {
     }
 }
 
+std::ostream& operator<<(std::ostream& os, const TokenType& type) {
+    os << GetTokenString(type);
+    return os;
+}
+
 static void PrintToken(const Token& token, size_t last_line_num) {
     std::string line_num_str = token.line == last_line_num ? "| " : std::to_string(token.line) + " ";
     std::string token_type_str = GetTokenString(token.type);
