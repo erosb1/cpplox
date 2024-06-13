@@ -108,22 +108,48 @@ BOOST_AUTO_TEST_CASE(LexerReadIdentifiers) {
 
 
 
+// Check that the lexer can read numbers correctly
+BOOST_AUTO_TEST_CASE(LexerReadKeywords) {
+    std::string source_code = "far \n for 45 while \n iff if else () while _and";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expectedTypes = {
+        TT::IDENTIFIER, TT::IDENTIFIER, TT::NUMBER, TT::WHILE, TT::IDENTIFIER,
+        TT::IF, TT::ELSE, TT::LEFT_PAREN, TT::RIGHT_PAREN, TT::WHILE, TT::IDENTIFIER, TT::END,
+    };
+
+    const std::vector<std::string> expectedLexemes = {
+        "far", "for", "45", "while", "iff", "if", "else", "(", ")", "while", "_and", ""
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    // Verify token properties
+    BOOST_REQUIRE_EQUAL(tokens.size(), expectedTypes.size());
+    for (size_t i = 0; i < expectedTypes.size(); ++i) {
+        BOOST_CHECK_EQUAL(tokens[i].type, expectedTypes[i]);
+        BOOST_CHECK_EQUAL(tokens[i].lexeme, expectedLexemes[i]);
+    }
+}
+
+
+
 
 // Check if the lexer can handle a basic variable declaration statement
-//BOOST_AUTO_TEST_CASE(LexerVarDeclaration) {
-//    std::string source_code = "var x = 54;";
-//    Lexer lexer(source_code);
-//
-//    const std::vector<TT> expected = {
-//        TT::VAR, TT::IDENTIFIER, TT::EQUAL, TT::NUMBER, TT::SEMICOLON, TT::END
-//    };
-//
-//    const std::vector<Token> tokens = lexer.Tokenize();
-//
-//    // Verify token properties
-//    BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
-//    for (size_t i = 0; i < expected.size(); ++i) {
-//        BOOST_CHECK_EQUAL(tokens[i].type, expected[i]);
-//        BOOST_CHECK_EQUAL(tokens[i].line, 0);
-//    }
-//}
+BOOST_AUTO_TEST_CASE(LexerVarDeclaration) {
+    std::string source_code = "var x = 54;";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expected = {
+        TT::VAR, TT::IDENTIFIER, TT::EQUAL, TT::NUMBER, TT::SEMICOLON, TT::END
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    // Verify token properties
+    BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        BOOST_CHECK_EQUAL(tokens[i].type, expected[i]);
+        BOOST_CHECK_EQUAL(tokens[i].line, 0);
+    }
+}

@@ -4,7 +4,7 @@
 #include "debug.h"
 
 int main() {
-    std::string src = "far boo \n far23 23 bar. yolo_is_100";
+    std::string src = "var x = 54;";
 
     Lexer lexer{std::string_view(src)};
     auto tokens = lexer.Tokenize();
