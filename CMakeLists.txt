@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
-project(LoxInterpreter)
+set(PROJECT_NAME_STR clox)
+project(${PROJECT_NAME_STR})
 set(CMAKE_CXX_STANDARD 20)
 
 # Include paths
