@@ -20,8 +20,8 @@ add_subdirectory(test)
 
 # Build
 set(SOURCE_FILES ${SRC_FILES} ${PROJECT_SOURCE_DIR}/src/main.cpp ${HEADER_FILES})
-add_executable(cool ${SOURCE_FILES})
-target_link_libraries(cool ${Boost_LIBRARIES})
+add_executable(clox ${SOURCE_FILES})
+target_link_libraries(clox ${Boost_LIBRARIES})
 
 # Include Boost directories
-target_include_directories(cool PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(clox PRIVATE ${Boost_INCLUDE_DIRS})
