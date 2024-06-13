@@ -12,6 +12,7 @@ Lexer::Lexer(std::string_view source_code)
 std::vector<Token> Lexer::Tokenize() {
     std::vector<Token> tokens;
     while (true) {
+        SkipWhitespace();
         if (IsAtEnd()) {
             start_index_ = cur_index_;
             tokens.push_back(CreateToken(TT::END));
@@ -58,7 +59,6 @@ Token Lexer::CreateToken(TT type) {
 }
 
 Token Lexer::ScanNext() {
-    SkipWhitespace();
     start_index_ = cur_index_;
     char c = Advance();
 
