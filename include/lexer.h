@@ -55,6 +55,7 @@ private:
     // More Specific Functions
     Token CreateToken(TT type);
     Token ScanNext();
+    Token ReadNumber();
     void SkipWhitespace();
 private:
     std::string_view source_code_;

@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include <cassert>
 
 Lexer::Lexer(std::string_view source_code)
     : source_code_(source_code)
@@ -11,6 +12,7 @@ std::vector<Token> Lexer::Tokenize() {
     std::vector<Token> tokens;
     while (true) {
         if (IsAtEnd()) {
+            start_index_ = cur_index_;
             tokens.push_back(CreateToken(TT::END));
             break;
         }
@@ -59,6 +61,8 @@ Token Lexer::ScanNext() {
     start_index_ = cur_index_;
     char c = Advance();
 
+    if (std::isdigit(c)) return ReadNumber();
+
     switch (c) {
         case '(': return CreateToken(TT::LEFT_PAREN);
         case ')': return CreateToken(TT::RIGHT_PAREN);
@@ -74,6 +78,18 @@ Token Lexer::ScanNext() {
         case '!': return CreateToken(TT::BANG);
         default: return CreateToken(TT::ERROR);
     }
+}
+
+Token Lexer::ReadNumber() {
+    // read digits until it finds non-digit
+    while (std::isdigit(Peek())) Advance();
+
+    if (Peek() == '.' && std::isdigit(PeekNext())) {
+        Advance(); // consume '.'
+        while (std::isdigit(Peek())) Advance();
+    }
+
+    return CreateToken(TT::NUMBER);
 }
 
 void Lexer::SkipWhitespace() {
