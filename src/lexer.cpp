@@ -77,6 +77,9 @@ Token Lexer::ScanNext() {
         case '/': return CreateToken(TT::SLASH);
         case '*': return CreateToken(TT::STAR);
         case '!': return CreateToken(TT::BANG);
+        case '=': return CreateToken(TT::EQUAL);
+        case '>': return CreateToken(TT::GREATER);
+        case '<': return CreateToken(TT::LESS);
         default: return CreateToken(TT::ERROR);
     }
 }
