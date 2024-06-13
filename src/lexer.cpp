@@ -18,7 +18,7 @@ std::vector<Token> Lexer::Tokenize() {
             tokens.push_back(CreateToken(TT::END));
             break;
         }
-        tokens.push_back(ScanNext());
+        tokens.push_back(ReadNextToken());
     }
     return tokens;
 }
@@ -58,7 +58,7 @@ Token Lexer::CreateToken(TT type) {
     return {type, sv, cur_line_};
 }
 
-Token Lexer::ScanNext() {
+Token Lexer::ReadNextToken() {
     start_index_ = cur_index_;
     char c = Advance();
 

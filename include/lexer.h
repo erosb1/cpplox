@@ -74,7 +74,7 @@ private:
 
     // More Specific Functions
     Token CreateToken(TT type);
-    Token ScanNext();
+    Token ReadNextToken();
     Token ReadNumber();
     Token ReadString();
     Token ReadIdentifier(); // Also used for reading keywords
