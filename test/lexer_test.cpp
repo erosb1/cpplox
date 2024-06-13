@@ -178,3 +178,96 @@ BOOST_AUTO_TEST_CASE(LexerStrings) {
         BOOST_CHECK_EQUAL(tokens[i].lexeme, expectedLexemes[i]);
     }
 }
+
+// Check if the lexer can handle strings: regular, multiline and unterminated
+BOOST_AUTO_TEST_CASE(LexerTwoCharTokens) {
+    std::string source_code = ">= = => ! != == =";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expected = {
+        TT::GREATER_EQUAL, TT::EQUAL, TT::EQUAL, TT::GREATER, TT::BANG, TT::BANG_EQUAL,
+        TT::EQUAL_EQUAL, TT::EQUAL, TT::END,
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    // Verify token properties
+    BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        BOOST_CHECK_EQUAL(tokens[i].type, expected[i]);
+    }
+}
+
+// Check if the lexer correctly reads a function statement
+BOOST_AUTO_TEST_CASE(LexerFunStatement) {
+    std::string source_code = R"str(
+        fun add(var x, var y) {
+            return x + y;
+        }
+    )str";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expected = {
+        TT::FUN, TT::IDENTIFIER, TT::LEFT_PAREN, TT::VAR, TT::IDENTIFIER, TT::COMMA, TT::VAR,
+        TT::IDENTIFIER, TT::RIGHT_PAREN, TT::LEFT_BRACE, TT::RETURN, TT::IDENTIFIER, TT::PLUS,
+        TT::IDENTIFIER, TT::SEMICOLON, TT::RIGHT_BRACE, TT::END,
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    // Verify token properties
+    BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        BOOST_CHECK_EQUAL(tokens[i].type, expected[i]);
+    }
+}
+
+// Check if the lexer can handle a basic variable declaration statement
+BOOST_AUTO_TEST_CASE(LexerWhileStatement) {
+    std::string source_code = R"str(
+        while (true) {
+            print("annoying message");
+        }
+    )str";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expected = {
+        TT::WHILE, TT::LEFT_PAREN, TT::TRUE, TT::RIGHT_PAREN, TT::LEFT_BRACE, TT::PRINT, TT::LEFT_PAREN,
+        TT::STRING, TT::RIGHT_PAREN, TT::SEMICOLON, TT::RIGHT_BRACE, TT::END,
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    // Verify token properties
+    BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        BOOST_CHECK_EQUAL(tokens[i].type, expected[i]);
+    }
+}
+
+
+// Check if the lexer can handle a basic variable declaration statement
+BOOST_AUTO_TEST_CASE(LexerIfElseStatement) {
+    std::string source_code = R"str(
+        if (age >= 18) {
+            print("can drive");
+        } else {
+            print("too bad");
+        }
+    )str";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expected = {
+        TT::IF, TT::LEFT_PAREN, TT::IDENTIFIER, TT::GREATER_EQUAL, TT::NUMBER, TT::RIGHT_PAREN, TT::LEFT_BRACE,
+        TT::PRINT, TT::LEFT_PAREN, TT::STRING, TT::RIGHT_PAREN, TT::SEMICOLON, TT::RIGHT_BRACE, TT::ELSE, TT::LEFT_BRACE,
+        TT::PRINT, TT::LEFT_PAREN, TT::STRING, TT::RIGHT_PAREN, TT::SEMICOLON, TT::RIGHT_BRACE, TT::END,
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    // Verify token properties
+    BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
+    for (size_t i = 0; i < expected.size(); ++i) {
+        BOOST_CHECK_EQUAL(tokens[i].type, expected[i]);
+    }
+}
