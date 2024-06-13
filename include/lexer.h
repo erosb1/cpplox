@@ -3,6 +3,8 @@
 
 #include <string_view>
 #include <vector>
+#include <unordered_map>
+
 
 /**
  *  TOKENS
@@ -31,6 +33,24 @@ enum class TokenType {
 
 using TT = TokenType;
 
+/*
+ *  KEYWORDS
+ */
+const std::unordered_map<std::string, TokenType> KEYWORDS = {
+    {"fun",    TT::FUN},
+    {"or",     TT::OR},
+    {"and",    TT::AND},
+    {"while",  TT::WHILE},
+    {"if",     TT::IF},
+    {"return", TT::RETURN},
+    {"var",    TT::VAR},
+    {"print",  TT::PRINT},
+    {"true",   TT::TRUE},
+    {"false",  TT::FALSE},
+    {"nil",    TT::NIL},
+    {"else",   TT::ELSE},
+};
+
 struct Token {
     TokenType type;
     std::string_view lexeme;
@@ -56,6 +76,7 @@ private:
     Token CreateToken(TT type);
     Token ScanNext();
     Token ReadNumber();
+    Token ReadIdentifier(); // Also used for reading keywords
     void SkipWhitespace();
 private:
     std::string_view source_code_;

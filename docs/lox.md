@@ -32,9 +32,9 @@ comparison       :=  term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term             :=  factor ( ( "-" | "+" ) factor )* ;
 factor           :=  unary ( ( "/" | "*" ) unary )* ;
 unary            :=  ( "!" | "-" ) unary ;
-primary          :=  "true" | "false" | "nil" | "this"
+primary          :=  "true" | "false" | "nil" | 
                      | NUMBER | STRING | IDENTIFIER 
-                     | "(" expression ")" | "super" "." IDENTIFIER ;
+                     | "(" expression ")" | "." IDENTIFIER ;
 
 function         :=  IDENTIFIER "(" [ parameters ] ")" block ;
 parameters       :=  IDENTIFIER ( "," IDENTIFIER )* ;

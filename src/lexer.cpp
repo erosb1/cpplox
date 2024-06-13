@@ -62,6 +62,7 @@ Token Lexer::ScanNext() {
     char c = Advance();
 
     if (std::isdigit(c)) return ReadNumber();
+    if (std::isalpha(c) || c == '_') return ReadIdentifier();
 
     switch (c) {
         case '(': return CreateToken(TT::LEFT_PAREN);
@@ -90,6 +91,16 @@ Token Lexer::ReadNumber() {
     }
 
     return CreateToken(TT::NUMBER);
+}
+
+Token Lexer::ReadIdentifier() {
+    while (std::isalpha(Peek()) || std::isdigit(Peek()) || Peek() == '_') Advance();
+    auto token = CreateToken(TT::IDENTIFIER);
+    auto lexeme_str = std::string(token.lexeme);
+    if (KEYWORDS.contains(lexeme_str)) {
+        token.type = KEYWORDS.at(lexeme_str);
+    }
+    return token;
 }
 
 void Lexer::SkipWhitespace() {
