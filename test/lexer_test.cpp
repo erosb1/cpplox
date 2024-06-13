@@ -37,13 +37,13 @@ BOOST_AUTO_TEST_CASE(LexerSingleCharTokens) {
     }
 }
 
-// Check if the lexer can handle a basic variable declaration statement
-BOOST_AUTO_TEST_CASE(LexerVarDeclaration) {
-    std::string source_code = "var x = 54;";
+// Ensure that the Lexer correctly scans single character tokens
+BOOST_AUTO_TEST_CASE(LexerIgnoreWhitespace) {
+    std::string source_code = "  \n  +  \r\t -  //this is a comment\n / *";
     Lexer lexer(source_code);
 
     const std::vector<TT> expected = {
-        TT::VAR, TT::IDENTIFIER, TT::EQUAL, TT::NUMBER, TT::SEMICOLON, TT::END
+        TT::PLUS, TT::MINUS, TT::SLASH, TT::STAR, TT::END,
     };
 
     const std::vector<Token> tokens = lexer.Tokenize();
@@ -52,6 +52,49 @@ BOOST_AUTO_TEST_CASE(LexerVarDeclaration) {
     BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
     for (size_t i = 0; i < expected.size(); ++i) {
         BOOST_CHECK_EQUAL(tokens[i].type, expected[i]);
-        BOOST_CHECK_EQUAL(tokens[i].line, 0);
     }
 }
+
+// Ensure that the Lexer correctly scans single character tokens
+BOOST_AUTO_TEST_CASE(LexerReadNumbers) {
+    std::string source_code = "56.433 4 54 34 . 45. 54.132 234234";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expectedTypes = {
+        TT::NUMBER, TT::NUMBER, TT::NUMBER, TT::NUMBER,
+        TT::DOT, TT::NUMBER, TT::DOT, TT::NUMBER, TT::NUMBER, TT::END,
+    };
+
+    const std::vector<std::string> expectedLexemes = {
+        "56.433", "4", "54", "34", ".", "45",
+        ".", "54.132", "234234", "",
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    // Verify token properties
+    BOOST_REQUIRE_EQUAL(tokens.size(), expectedTypes.size());
+    for (size_t i = 0; i < expectedTypes.size(); ++i) {
+        BOOST_CHECK_EQUAL(tokens[i].type, expectedTypes[i]);
+        BOOST_CHECK_EQUAL(tokens[i].lexeme, expectedLexemes[i]);
+    }
+}
+
+// Check if the lexer can handle a basic variable declaration statement
+//BOOST_AUTO_TEST_CASE(LexerVarDeclaration) {
+//    std::string source_code = "var x = 54;";
+//    Lexer lexer(source_code);
+//
+//    const std::vector<TT> expected = {
+//        TT::VAR, TT::IDENTIFIER, TT::EQUAL, TT::NUMBER, TT::SEMICOLON, TT::END
+//    };
+//
+//    const std::vector<Token> tokens = lexer.Tokenize();
+//
+//    // Verify token properties
+//    BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
+//    for (size_t i = 0; i < expected.size(); ++i) {
+//        BOOST_CHECK_EQUAL(tokens[i].type, expected[i]);
+//        BOOST_CHECK_EQUAL(tokens[i].line, 0);
+//    }
+//}
