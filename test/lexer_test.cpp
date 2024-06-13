@@ -12,13 +12,13 @@ bool CheckCorrectTokenTypes(std::vector<Token> source, std::vector<TT> expected)
     return true;
 }
 
-// Ensure that the lexer only generates EOF token for empty source_code
+// Ensure that the lexer only generates END token for empty source_code
 BOOST_AUTO_TEST_CASE(LexerEmptySourceCode) {
     std::string source_code = "";
     Lexer lexer(source_code);
 
     const std::vector<TT> expected = {
-        TT::EOF
+        TT::END
     };
 
     const std::vector<Token> tokens = lexer.Tokenize();
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(LexerEmptyVarDeclaration) {
         TT::EQUAL,
         TT::NUMBER,
         TT::SEMICOLON,
-        TT::EOF
+        TT::END
     };
 
     const std::vector<Token> tokens = lexer.Tokenize();

@@ -1,6 +1,5 @@
 #ifndef LEXER_H
 #define LEXER_H
-#undef EOF // undefine EOF macro to allow for TokenType::EOF
 
 #include <string_view>
 #include <vector>
@@ -27,7 +26,7 @@ enum class TokenType {
     PRINT, RETURN,
     TRUE, VAR, WHILE,
     ERROR,
-    EOF
+    END,
 };
 
 using TT = TokenType;
@@ -54,7 +53,7 @@ private:
     [[nodiscard]] bool IsAtEnd() const;
 private:
     std::string_view source_code_;
-    size_t cur_token_index_;
+    size_t cur_index_;
     size_t cur_line_;
 };
 
