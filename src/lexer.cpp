@@ -1,5 +1,6 @@
 #include "lexer.h"
 #include <cassert>
+#include <boost/test/unit_test_log.hpp>
 
 Lexer::Lexer(std::string_view source_code)
     : source_code_(source_code)
@@ -80,6 +81,7 @@ Token Lexer::ScanNext() {
         case '=': return CreateToken(TT::EQUAL);
         case '>': return CreateToken(TT::GREATER);
         case '<': return CreateToken(TT::LESS);
+        case '"': return ReadString();
         default: return CreateToken(TT::ERROR);
     }
 }
@@ -94,6 +96,25 @@ Token Lexer::ReadNumber() {
     }
 
     return CreateToken(TT::NUMBER);
+}
+
+Token Lexer::ReadString() {
+    size_t ending_line = cur_line_; // only used for multiline strings
+    while (!IsAtEnd() && Peek() != '"') {
+        if (Peek() == '\n') ending_line++;
+        Advance();
+    }
+
+    if (IsAtEnd()) { // If the string never terminated
+        auto token = CreateToken(TT::ERROR);
+        cur_line_ = ending_line;
+        return token;
+    }
+
+    Advance(); // consume the ending "
+    auto token = CreateToken(TT::STRING);
+    cur_line_ = ending_line;
+    return token;
 }
 
 Token Lexer::ReadIdentifier() {

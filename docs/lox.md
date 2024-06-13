@@ -1,4 +1,5 @@
-This is the entire grammar of the cool programming language in EBNF:
+This is the entire grammar of the lox programming language in EBNF:
+(without classes)
 ```
 program          :=  declaration* EOF;
 
@@ -49,16 +50,16 @@ DIGIT            :=  "0" ... "9" ;
 
 
 ## Operator Precedence Levels
-| Precedence | Operators | Description    |
-|------------|-----------|----------------|
-| 1          | ! -       | Unary          |
-| 2          | / *       | Multiplicative |
-| 3          | + -       | Additive       |
-| 4          | > >= < <= | Relational     |
-| 5          | == !=     | Equality       |
-| 6          | and       | Logical AND    |
-| 7          | or        | Logical OR     |
-| 8          | =         | Assignment     |
+| Precedence | Operators  | Description    |
+|------------|------------|----------------|
+| 1          | ! -        | Unary          |
+| 2          | / *        | Multiplicative |
+| 3          | + -        | Additive       |
+| 4          | \> >= < <= | Relational     |
+| 5          | == !=      | Equality       |
+| 6          | and        | Logical AND    |
+| 7          | or         | Logical OR     |
+| 8          | =          | Assignment     |
 
 
 ## Tokens
@@ -99,6 +100,6 @@ DIGIT            :=  "0" ... "9" ;
 | VAR           | var       |
 | WHILE         | while     |
 | ERROR         |           |
-| EOF           |           |
+| END           |           |
 
 

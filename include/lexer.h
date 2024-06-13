@@ -76,6 +76,7 @@ private:
     Token CreateToken(TT type);
     Token ScanNext();
     Token ReadNumber();
+    Token ReadString();
     Token ReadIdentifier(); // Also used for reading keywords
     void SkipWhitespace();
 private:
