@@ -153,3 +153,28 @@ BOOST_AUTO_TEST_CASE(LexerVarDeclaration) {
         BOOST_CHECK_EQUAL(tokens[i].line, 0);
     }
 }
+
+// Check if the lexer can handle strings: regular, multiline and unterminated
+BOOST_AUTO_TEST_CASE(LexerStrings) {
+    std::string source_code = "\"this is a string\" while (true) { hello 23 } \" this is a \n multiline string \" \" this is an unterminated string";
+    Lexer lexer(source_code);
+
+    const std::vector<TT> expectedTypes = {
+        TT::STRING, TT::WHILE, TT::LEFT_PAREN, TT::TRUE, TT::RIGHT_PAREN, TT::LEFT_BRACE,
+        TT::IDENTIFIER, TT::NUMBER, TT::RIGHT_BRACE, TT::STRING, TT::ERROR, TT::END,
+    };
+
+    const std::vector<std::string> expectedLexemes = {
+        "\"this is a string\"", "while", "(", "true", ")", "{", "hello", "23", "}",
+        "\" this is a \n multiline string \"", "\" this is an unterminated string", ""
+    };
+
+    const std::vector<Token> tokens = lexer.Tokenize();
+
+    // Verify token properties
+    BOOST_REQUIRE_EQUAL(tokens.size(), expectedTypes.size());
+    for (size_t i = 0; i < expectedTypes.size(); ++i) {
+        BOOST_CHECK_EQUAL(tokens[i].type, expectedTypes[i]);
+        BOOST_CHECK_EQUAL(tokens[i].lexeme, expectedLexemes[i]);
+    }
+}
