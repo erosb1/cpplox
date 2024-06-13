@@ -30,6 +30,8 @@ enum class TokenType {
     EOF
 };
 
+using TT = TokenType;
+
 struct Token {
     TokenType type;
     std::string_view lexeme;
