@@ -59,7 +59,7 @@ DeclarationPtr Parser::ParseDeclaration() {
 
 VarDeclPtr Parser::ParseVarDecl() {
     auto varDecl = std::make_unique<VarDecl>();
-    varDecl->identifier = ParseIdentifier();
+    varDecl->variable_name = ParseIdentifier("Expected a variable name");
     if (Match(TT::EQUAL)) {
         varDecl-> expression = ParseExpression();
     } else {
@@ -67,6 +67,17 @@ VarDeclPtr Parser::ParseVarDecl() {
     }
     Consume(TokenType::SEMICOLON, "Expected ; after variable declaration");
     return std::move(varDecl);
+}
+
+ExpressionPtr Parser::ParseExpression() {
+    // TODO Finish this function
+    auto expression = std::make_unique<Expression>();
+    return std::move(expression);
+}
+
+std::string_view Parser::ParseIdentifier(std::string_view error_msg) {
+    Consume(TT::IDENTIFIER, error_msg);
+    return prev_token_.lexeme;
 }
 
 void Parser::ErrorAt(Token &token, std::string_view msg) {

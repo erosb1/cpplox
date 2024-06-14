@@ -18,6 +18,8 @@ private:
     // Parsing Specific NodeTypes
     DeclarationPtr ParseDeclaration();
     VarDeclPtr ParseVarDecl();
+    ExpressionPtr ParseExpression();
+    std::string_view ParseIdentifier(std::string_view error_msg);
 
     // Error Handling
     void ErrorAt(Token& token, std::string_view msg);
