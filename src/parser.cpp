@@ -4,15 +4,18 @@
 Parser::Parser(std::string_view source_code)
     : lexer_(source_code)
     , prev_token_(TT::ERROR, "", -1)
-    , cur_token_(TT::ERROR, "", -1) {
-    Advance(); Advance(); // Generate the first two tokens;
-}
+    , cur_token_(TT::ERROR, "", -1)
+{}
 
-Program Parser::GenerateAST() {
-    Program program;
+ProgramPtr Parser::GenerateAST() {
+    auto ast = std::make_unique<Program>();
 
+    Advance();
+    while (cur_token_.type != TokenType::ERROR) {
+        ast->declarations.push_back(ParseDeclaration());
+    }
 
-    return program;
+    return std::move(ast);
 }
 
 void Parser::Advance() {
@@ -24,6 +27,46 @@ void Parser::Advance() {
         if (cur_token_.type != TT::ERROR) break;
         // ErrorAtCur(token_.lexeme);
     }
+}
+
+void Parser::Consume(TT type, std::string_view error_msg) {
+    if (Check(type)) {
+        Advance();
+        return;
+    }
+    ErrorAtCur(error_msg);
+}
+
+bool Parser::Check(TT type) const {
+    return cur_token_.type == type;
+}
+
+bool Parser::Match(TT type) {
+    if (Check(type)) {
+        Advance();
+        return true;
+    }
+    return false;
+}
+
+DeclarationPtr Parser::ParseDeclaration() {
+    if (Match(TT::VAR)) {
+        return std::move(ParseVarDecl());
+    } else {
+        //return ParseStatement();
+    }
+}
+
+VarDeclPtr Parser::ParseVarDecl() {
+    auto varDecl = std::make_unique<VarDecl>();
+    varDecl->identifier = ParseIdentifier();
+    if (Match(TT::EQUAL)) {
+        varDecl-> expression = ParseExpression();
+    } else {
+        varDecl->expression = nullptr;
+    }
+    Consume(TokenType::SEMICOLON, "Expected ; after variable declaration");
+    return std::move(varDecl);
 }
 
 void Parser::ErrorAt(Token &token, std::string_view msg) {

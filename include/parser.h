@@ -7,9 +7,17 @@
 class Parser {
 public:
     explicit Parser(std::string_view source_code);
-    Program GenerateAST();
+    ProgramPtr GenerateAST();
 private:
-    void Advance();
+    // Control functions
+    void Advance(); // Reads tokens until TokenType != ERROR
+    void Consume(TT type, std::string_view error_msg); // Checks if cur_token_ == type, advances and creates error if not
+    [[nodiscard]] bool Check(TT type) const; // Checks if cur_token_ == type
+    bool Match(TT type); // Checks if cur_token_ == type and advances
+
+    // Parsing Specific NodeTypes
+    DeclarationPtr ParseDeclaration();
+    VarDeclPtr ParseVarDecl();
 
     // Error Handling
     void ErrorAt(Token& token, std::string_view msg);
