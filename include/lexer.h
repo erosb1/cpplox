@@ -63,7 +63,8 @@ struct Token {
 class Lexer {
 public:
     explicit Lexer(std::string_view source_code);
-    std::vector<Token> Tokenize();
+    std::vector<Token> TokenizeAll(); // Tokenizes entire source file, only used for testing and debugging
+    Token ReadNextToken();
 private:
     // Lexer Control Functions
     char Advance();
@@ -78,7 +79,6 @@ private:
     Token CreateErrorToken(const char(&msg)[N]);
 
     // Read Source Code
-    Token ReadNextToken();
     Token ReadNumber();
     Token ReadString();
     Token ReadIdentifier(); // Also used for reading keywords

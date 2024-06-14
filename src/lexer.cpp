@@ -9,7 +9,7 @@ Lexer::Lexer(std::string_view source_code)
     , cur_line_(0)
 {}
 
-std::vector<Token> Lexer::Tokenize() {
+std::vector<Token> Lexer::TokenizeAll() {
     std::vector<Token> tokens;
     while (true) {
         SkipWhitespace();
@@ -22,51 +22,6 @@ std::vector<Token> Lexer::Tokenize() {
     }
     return tokens;
 }
-
-// Returns the current character than increments the pointer to the next character
-char Lexer::Advance() {
-    if (IsAtEnd()) return 0;
-    return source_code_[cur_index_++];
-}
-
-// Checks if the current character is equal to expected, if it is then it returns true and increments pointer
-// if not then it just returns false without incrementing
-bool Lexer::Match(char expected) {
-    if (IsAtEnd()) return false;
-    if (source_code_[cur_index_] != expected) return false;
-    cur_index_++;
-    return true;
-}
-
-// Returns the value of the current character without incrementing the pointer
-char Lexer::Peek() const {
-    return source_code_[cur_index_];
-}
-
-// Returns the value of the next character without incrementing the pointer
-char Lexer::PeekNext() const {
-    return source_code_[cur_index_ + 1];
-}
-
-// Checks if the current character is the null terminator
-bool Lexer::IsAtEnd() const {
-    return source_code_[cur_index_] == '\0';
-}
-
-Token Lexer::CreateToken(TT type) {
-    auto sv = std::string_view(source_code_.begin() + start_index_, source_code_.begin() + cur_index_);
-    return {type, sv, cur_line_};
-}
-
-template<std::size_t N>
-Token Lexer::CreateErrorToken(const char(&msg)[N]) {
-    static_assert(N > 0);
-    return {TokenType::ERROR, std::string_view(msg, N - 1), cur_line_};
-}
-
-// Explicit instantiations for known message sizes
-template Token Lexer::CreateErrorToken<17>(const char(&msg)[17]); // "Invalid Character"
-template Token Lexer::CreateErrorToken<19>(const char(&msg)[19]); // "Unterminated String"
 
 Token Lexer::ReadNextToken() {
     start_index_ = cur_index_;
@@ -119,6 +74,52 @@ Token Lexer::ReadNextToken() {
         default: return CreateErrorToken("Invalid Character");
     }
 }
+
+
+// Returns the current character than increments the pointer to the next character
+char Lexer::Advance() {
+    if (IsAtEnd()) return 0;
+    return source_code_[cur_index_++];
+}
+
+// Checks if the current character is equal to expected, if it is then it returns true and increments pointer
+// if not then it just returns false without incrementing
+bool Lexer::Match(char expected) {
+    if (IsAtEnd()) return false;
+    if (source_code_[cur_index_] != expected) return false;
+    cur_index_++;
+    return true;
+}
+
+// Returns the value of the current character without incrementing the pointer
+char Lexer::Peek() const {
+    return source_code_[cur_index_];
+}
+
+// Returns the value of the next character without incrementing the pointer
+char Lexer::PeekNext() const {
+    return source_code_[cur_index_ + 1];
+}
+
+// Checks if the current character is the null terminator
+bool Lexer::IsAtEnd() const {
+    return source_code_[cur_index_] == '\0';
+}
+
+Token Lexer::CreateToken(TT type) {
+    auto sv = std::string_view(source_code_.begin() + start_index_, source_code_.begin() + cur_index_);
+    return {type, sv, cur_line_};
+}
+
+template<std::size_t N>
+Token Lexer::CreateErrorToken(const char(&msg)[N]) {
+    static_assert(N > 0);
+    return {TokenType::ERROR, std::string_view(msg, N - 1), cur_line_};
+}
+
+// Explicit instantiations for known message sizes
+template Token Lexer::CreateErrorToken<17>(const char(&msg)[17]); // "Invalid Character"
+template Token Lexer::CreateErrorToken<19>(const char(&msg)[19]); // "Unterminated String"
 
 Token Lexer::ReadNumber() {
     // read digits until it finds non-digit
