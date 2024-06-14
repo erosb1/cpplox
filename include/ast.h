@@ -37,17 +37,19 @@ public:
 };
 
 class Declaration : public ASTNode {
+public:
     virtual ~Declaration() = default;
 };
 
 class FunDecl : public Declaration {
-    std::unique_ptr<Function> function;
+    //std::unique_ptr<Function> function;
+    ~FunDecl() override = default;
     void accept(ASTVisitor &visitor) override;
 };
 
 class VarDecl : public Declaration {
     std::string identifier;
-    std::unique_ptr<Expression> expression;
+    //std::unique_ptr<Expression> expression;
     void accept(ASTVisitor &visitor) override;
 };
 

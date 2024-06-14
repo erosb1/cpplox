@@ -22,8 +22,13 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 # Build unit tests
 add_definitions(-DBOOST_TEST_DYN_LINK)
-add_executable(${PROJECT_UNIT_TESTS_NAME} ${UNIT_TESTS_SRC_FILES} ${SRC_FILES})
-target_link_libraries(${PROJECT_UNIT_TESTS_NAME} ${Boost_LIBRARIES})
+
+# Create an executable for each test source file
+foreach(TEST_SRC ${UNIT_TESTS_SRC_FILES})
+    get_filename_component(TEST_NAME ${TEST_SRC} NAME_WE)
+    add_executable(${TEST_NAME} ${TEST_SRC} ${SRC_FILES})
+    target_link_libraries(${TEST_NAME} ${Boost_LIBRARIES})
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endforeach()
 
 enable_testing()
-add_test(DemoTest ${PROJECT_UNIT_TESTS_NAME})
