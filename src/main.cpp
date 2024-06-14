@@ -12,7 +12,7 @@ int main() {
     )str";
 
     Lexer lexer{std::string_view(src)};
-    auto tokens = lexer.Tokenize();
+    auto tokens = lexer.TokenizeAll();
 
     PrintTokens(tokens);
     return 0;

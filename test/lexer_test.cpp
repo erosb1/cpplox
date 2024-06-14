@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE(LexerEmptySourceCode) {
     Lexer lexer(source_code);
 
     const std::vector<TT> expected = { TT::END };
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), 1);
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(LexerSingleCharTokens) {
         TT::SLASH, TT::STAR, TT::END
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(LexerIgnoreWhitespace) {
         TT::PLUS, TT::MINUS, TT::SLASH, TT::STAR, TT::END,
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(LexerReadNumbers) {
         ".", "54.132", "234234", "",
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expectedTypes.size());
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(LexerReadIdentifiers) {
         "far", "boo", "far23", "23", "bar", ".", "yolo_is_100", "",
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expectedTypes.size());
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(LexerReadKeywords) {
         "far", "for", "45", "while", "iff", "if", "else", "(", ")", "while", "_and", ""
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expectedTypes.size());
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(LexerVarDeclaration) {
         TT::VAR, TT::IDENTIFIER, TT::EQUAL, TT::NUMBER, TT::SEMICOLON, TT::END
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(LexerStrings) {
         "\" this is a \n multiline string \"", "\" this is an unterminated string", ""
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expectedTypes.size());
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(LexerTwoCharTokens) {
         TT::EQUAL_EQUAL, TT::EQUAL, TT::END,
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(LexerFunStatement) {
         TT::IDENTIFIER, TT::SEMICOLON, TT::RIGHT_BRACE, TT::END,
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE(LexerWhileStatement) {
         TT::STRING, TT::RIGHT_PAREN, TT::SEMICOLON, TT::RIGHT_BRACE, TT::END,
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(LexerIfElseStatement) {
         TT::PRINT, TT::LEFT_PAREN, TT::STRING, TT::RIGHT_PAREN, TT::SEMICOLON, TT::RIGHT_BRACE, TT::END,
     };
 
-    const std::vector<Token> tokens = lexer.Tokenize();
+    const std::vector<Token> tokens = lexer.TokenizeAll();
 
     // Verify token properties
     BOOST_REQUIRE_EQUAL(tokens.size(), expected.size());
