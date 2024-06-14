@@ -4,8 +4,12 @@
 #include <iostream>
 
 #include "lexer.h"
+#include "ast.h"
 
-void PrintTokens(const std::vector<Token>& tokens);
+namespace Debug {
+    void PrintTokens(const std::vector<Token>& tokens);
+    void PrintAST(const ASTNode* head, size_t indent_level = 0);
+}
 
 // Used for printing TokenTypes in unit tests
 std::ostream& operator<<(std::ostream& os, const TokenType& type);

@@ -19,6 +19,7 @@ class VarDecl;
 class Expression;
 class Function;
 
+using ASTNodePtr = std::unique_ptr<ASTNode>;
 using ProgramPtr = std::unique_ptr<Program>;
 using DeclarationPtr = std::unique_ptr<Declaration>;
 using FunDeclPtr = std::unique_ptr<FunDecl>;

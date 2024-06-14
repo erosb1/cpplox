@@ -1,6 +1,8 @@
 #include "debug.h"
 #include <iomanip>
 
+constexpr size_t AST_INDENT_SPACING = 4;
+
 static std::string GetTokenString(TokenType type) {
     switch (type) {
         case TokenType::LEFT_PAREN: return "LEFT_PAREN";
@@ -56,7 +58,7 @@ static void PrintToken(const Token& token, size_t last_line_num) {
         << token_type_str << "    " << std::setw(8) << token.lexeme << '\n';
 }
 
-void PrintTokens(const std::vector<Token> &tokens) {
+void Debug::PrintTokens(const std::vector<Token> &tokens) {
     std::cout << "[line]    [TokenType]       [lexeme]\n";
     size_t last_line_num = -1;
     for (auto& token : tokens) {
@@ -64,4 +66,27 @@ void PrintTokens(const std::vector<Token> &tokens) {
         last_line_num = token.line;
     }
     std::cout << std::endl;
+}
+
+void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
+    auto spacing = std::string(indent_level * AST_INDENT_SPACING, ' ');
+    auto spacing2 = spacing + std::string(AST_INDENT_SPACING, ' ');
+    if (const auto* program = dynamic_cast<const Program*>(node)) {
+        std::cout << spacing << "Program {\n";
+        for (auto& declaration : program->declarations) {
+            PrintAST(declaration.get(), indent_level + 1);
+        }
+        std::cout << spacing << "},\n";
+    } else if (const auto* varDecl = dynamic_cast<const VarDecl*>(node)) {
+        std::cout << spacing << "VarDecl {\n"
+                  << spacing2 << "variable_name: \"" << varDecl->variable_name << "\",\n";
+        PrintAST(varDecl->expression.get(), indent_level + 1);
+        std::cout << spacing << "},\n";
+    } else if (const auto* expr = dynamic_cast<const Expression*>(node)) {
+        std::cout << spacing << "Expression: {\n"
+                  << spacing2 << " {{ Insert Expression Stuff }}\n"
+                  << spacing << "},\n";
+    } else {
+        std::cout << spacing << "Unknown ASTNode type {}, \n";
+    }
 }
