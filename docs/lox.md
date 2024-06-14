@@ -32,7 +32,8 @@ equality         :=  comparison ( ( "!=" | "==" ) comparison )* ;
 comparison       :=  term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term             :=  factor ( ( "-" | "+" ) factor )* ;
 factor           :=  unary ( ( "/" | "*" ) unary )* ;
-unary            :=  ( "!" | "-" ) unary ;
+unary            :=  ( "!" | "-" ) unary | call ;
+call             :=  primary "(" [ arguments ] ")"
 primary          :=  "true" | "false" | "nil" | 
                      | NUMBER | STRING | IDENTIFIER 
                      | "(" expression ")" | "." IDENTIFIER ;
