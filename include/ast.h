@@ -16,14 +16,18 @@ class Program;
 class Declaration;
 class FunDecl;
 class VarDecl;
+class Statement;
+class ExprStmt;
 class Expression;
 class Function;
 
 using ASTNodePtr = std::unique_ptr<ASTNode>;
 using ProgramPtr = std::unique_ptr<Program>;
-using DeclarationPtr = std::unique_ptr<Declaration>;
+using DeclarationPtr = std::unique_ptr<Declaration>; // Abstract class
 using FunDeclPtr = std::unique_ptr<FunDecl>;
 using VarDeclPtr = std::unique_ptr<VarDecl>;
+using StatementPtr = std::unique_ptr<Statement>; // Abstract class
+using ExprStmtPtr = std::unique_ptr<ExprStmt>;
 using ExpressionPtr = std::unique_ptr<Expression>;
 using FunctionPtr = std::unique_ptr<Function>;
 
@@ -39,6 +43,7 @@ public:
     virtual void visit(Program &node) = 0;
     virtual void visit(FunDecl &node) = 0;
     virtual void visit(VarDecl &node) = 0;
+    virtual void visit(ExprStmt &node) = 0;
     virtual void visit(Expression &node) = 0;
     virtual void visit(Function &node) = 0;
 };
@@ -68,6 +73,17 @@ public:
     void accept(ASTVisitor &visitor) override;
 };
 
+class Statement : public Declaration {
+public:
+    virtual ~Statement() = default;
+};
+
+class ExprStmt : public Statement {
+public:
+    ExpressionPtr expression;
+    void accept(ASTVisitor &visitor) override;
+};
+
 class Expression : public ASTNode {
 public:
     void accept(ASTVisitor &visitor) override;
@@ -81,6 +97,7 @@ public:
 inline void Program::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void FunDecl::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void VarDecl::accept(ASTVisitor &visitor) { visitor.visit(*this); }
+inline void ExprStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Expression::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Function::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 

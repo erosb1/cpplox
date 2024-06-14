@@ -6,21 +6,9 @@
 #include "debug.h"
 
 int main() {
-    ProgramPtr program = std::make_unique<Program>();
-    VarDeclPtr varDecl = std::make_unique<VarDecl>();
-    varDecl->variable_name = "Foo";
-    ExpressionPtr expression = std::make_unique<Expression>();
-    varDecl->expression = std::move(expression);
-
-    VarDeclPtr varDecl2 = std::make_unique<VarDecl>();
-    varDecl2->variable_name = "Bar";
-    ExpressionPtr expression2 = std::make_unique<Expression>();
-    varDecl2->expression = std::move(expression2);
-
-    program->declarations.push_back(std::move(varDecl));
-    program->declarations.push_back(std::move(varDecl2));
-
-    Debug::PrintAST(program.get());
-
+    std::string source_code = "var foo = 65;";
+    Parser parser(source_code);
+    auto ast = parser.GenerateAST();
+    Debug::PrintAST(ast.get());
     return 0;
 }

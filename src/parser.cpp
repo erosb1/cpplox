@@ -65,8 +65,23 @@ VarDeclPtr Parser::ParseVarDecl() {
     } else {
         varDecl->expression = nullptr;
     }
-    Consume(TokenType::SEMICOLON, "Expected ; after variable declaration");
+    Consume(TT::SEMICOLON, "Expected ; after variable declaration.");
     return std::move(varDecl);
+}
+
+StatementPtr Parser::ParseStatement() {
+    if (Match(TT::IF)) {
+        // return std::move(ParseIfStmt());
+    } else {
+        return std::move(ParseExprStmt());
+    }
+}
+
+ExprStmtPtr Parser::ParseExprStmt() {
+    auto expr_stmt = std::make_unique<ExprStmt>();
+    expr_stmt->expression = ParseExpression();
+    Consume(TT::SEMICOLON, "Expected ; after expression.");
+    return std::move(expr_stmt);
 }
 
 ExpressionPtr Parser::ParseExpression() {
