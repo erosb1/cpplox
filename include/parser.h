@@ -1,6 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <functional>
+
 #include "ast.h"
 #include "lexer.h"
 
@@ -21,6 +23,13 @@ private:
     StatementPtr ParseStatement();
     ExprStmtPtr ParseExprStmt();
     ExpressionPtr ParseExpression();
+    AssignmentPtr ParseAssignment();
+    BinaryPtr ParseBinary();
+    UnaryPtr ParseUnary();
+    LiteralPtr ParseLiteral();
+    LiteralPtr ParseString();
+    GroupingPtr ParseGrouping();
+    CallPtr ParseCall();
 
     // Parse smaller stuff
     std::string_view ParseIdentifier(std::string_view error_msg);
@@ -35,6 +44,30 @@ private:
     Token cur_token_;
     bool panic_mode_;  // switches between true/false when encountering errors and synchronizing
     bool had_error_;   // remains true throughout entire parsing if had one error
+
+
+    // Pratt Parsing
+    enum class Precedence {
+        NONE,
+        ASSIGNMENT,  // =
+        OR,          // or
+        AND,         // and
+        EQUALITY,    // == !=
+        COMPARISON,  // < > <= >=
+        TERM,        // + -
+        FACTOR,      // * /
+        UNARY,       // ! -
+        CALL,        // . ()
+        PRIMARY
+    };
+
+    using ParseFn = std::function<ExpressionPtr(Parser&)>;
+    struct ParseRule {
+        ParseFn prefix;
+        ParseFn infix;
+        Precedence precedence;
+    };
+    std::unordered_map<TokenType, ParseRule> pratt_table_;
 };
 
 

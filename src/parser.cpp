@@ -1,11 +1,33 @@
 #include "parser.h"
 #include <iostream>
+#include <unordered_map>
+#include <functional>
 
 Parser::Parser(std::string_view source_code)
     : lexer_(source_code)
     , prev_token_(TT::ERROR, "", -1)
     , cur_token_(TT::ERROR, "", -1)
-{}
+    , panic_mode_(false)
+    , had_error_(false) {
+
+    pratt_table_[TT::TRUE] = {ParseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::FALSE] = {ParseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::NIL] = {ParseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::STRING] = {ParseString, nullptr, Precedence::NONE};
+    pratt_table_[TT::OR] = {nullptr, ParseBinary, Precedence::OR};
+    pratt_table_[TT::AND] = {nullptr, ParseBinary, Precedence::AND};
+    pratt_table_[TT::EQUAL_EQUAL] = {nullptr, ParseBinary, Precedence::EQUALITY};
+    pratt_table_[TT::BANG_EQUAL] = {nullptr, ParseBinary, Precedence::EQUALITY};
+    pratt_table_[TT::GREATER] = {nullptr, ParseBinary, Precedence::COMPARISON};
+    pratt_table_[TT::GREATER_EQUAL] = {nullptr, ParseBinary, Precedence::COMPARISON};
+    pratt_table_[TT::LESS] = {nullptr, ParseBinary, Precedence::COMPARISON};
+    pratt_table_[TT::LESS_EQUAL] = {nullptr, ParseBinary, Precedence::COMPARISON};
+    pratt_table_[TT::PLUS] = {nullptr, ParseBinary, Precedence::TERM};
+    pratt_table_[TT::MINUS] = {ParseUnary, ParseBinary, Precedence::TERM};
+    pratt_table_[TT::STAR] = {nullptr, ParseBinary, Precedence::FACTOR};
+    pratt_table_[TT::SLASH] = {nullptr, ParseBinary, Precedence::FACTOR};
+    pratt_table_[TT::LEFT_PAREN] = {ParseGrouping, ParseCall, Precedence::CALL};
+}
 
 ProgramPtr Parser::GenerateAST() {
     auto ast = std::make_unique<Program>();
@@ -88,6 +110,34 @@ ExpressionPtr Parser::ParseExpression() {
     // TODO Finish this function
     auto expression = std::make_unique<Expression>();
     return std::move(expression);
+}
+
+AssignmentPtr Parser::ParseAssignment() {
+    // TODO Implement
+}
+
+BinaryPtr Parser::ParseBinary() {
+    // TODO Implement
+}
+
+UnaryPtr Parser::ParseUnary() {
+    // TODO Implement
+}
+
+LiteralPtr Parser::ParseLiteral() {
+    // TODO Implement
+}
+
+LiteralPtr Parser::ParseString() {
+    // TODO Implement
+}
+
+GroupingPtr Parser::ParseGrouping() {
+    // TODO Implement
+}
+
+CallPtr Parser::ParseCall() {
+    // TODO Implement
 }
 
 std::string_view Parser::ParseIdentifier(std::string_view error_msg) {
