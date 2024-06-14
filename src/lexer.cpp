@@ -64,7 +64,7 @@ Token Lexer::CreateErrorToken(const char(&msg)[N]) {
     return {TokenType::ERROR, std::string_view(msg, N - 1), cur_line_};
 }
 
-// Explicit instantiations for known messages
+// Explicit instantiations for known message sizes
 template Token Lexer::CreateErrorToken<17>(const char(&msg)[17]); // "Invalid Character"
 template Token Lexer::CreateErrorToken<19>(const char(&msg)[19]); // "Unterminated String"
 
