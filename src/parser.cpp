@@ -1,4 +1,6 @@
 #include "parser.h"
+
+#include <cassert>
 #include <iostream>
 #include <unordered_map>
 #include <functional>
@@ -11,10 +13,10 @@ Parser::Parser(std::string_view source_code)
     , had_error_(false) {
 
     auto parseLiteral = std::bind(&Parser::ParseLiteral, this);
-    auto parseBinary = std::bind(&Parser::ParseBinary, this);
+    auto parseBinary = std::bind(&Parser::ParseBinary, this, std::placeholders::_1);
     auto parseUnary = std::bind(&Parser::ParseUnary, this);
     auto parseGrouping = std::bind(&Parser::ParseGrouping, this);
-    auto parseCall = std::bind(&Parser::ParseCall, this);
+    auto parseCall = std::bind(&Parser::ParseCall, this, std::placeholders::_1);
 
     pratt_table_[TT::TRUE]          = {parseLiteral, nullptr, Precedence::NONE};
     pratt_table_[TT::FALSE]         = {parseLiteral, nullptr, Precedence::NONE};
@@ -40,7 +42,7 @@ ProgramPtr Parser::GenerateAST() {
 
     Advance();
     while (cur_token_.type != TokenType::ERROR) {
-        ast->declarations.push_back(ParseDeclaration());
+        ast->declarations.push_back(std::move(ParseDeclaration()));
     }
 
     return std::move(ast);
@@ -77,11 +79,16 @@ bool Parser::Match(TT type) {
     return false;
 }
 
+Parser::ParseRule Parser::GetRule(TokenType type) {
+    assert(pratt_table_.contains(type));
+    return pratt_table_.at(type);
+}
+
 DeclarationPtr Parser::ParseDeclaration() {
     if (Match(TT::VAR)) {
         return std::move(ParseVarDecl());
     } else {
-        //return ParseStatement();
+        return ParseStatement();
     }
 }
 
@@ -119,12 +126,12 @@ ExpressionPtr Parser::ParseExpression(Precedence precedence) {
         return nullptr;
     }
 
-    auto prefixFn = pratt_table_.at(prev_token_.type).prefix;
+    auto prefixFn = GetRule(prev_token_.type).prefix;
     auto left = prefixFn();
 
-    while (precedence <= pratt_table_.at(cur_token_.type).precedence) {
+    while (precedence <= GetRule(cur_token_.type).precedence) {
         Advance();
-        auto infixFn = pratt_table_.at(prev_token_.type).infix;
+        auto infixFn = GetRule(prev_token_.type).infix;
         left = infixFn(std::move(left));
     }
 
@@ -135,12 +142,12 @@ AssignmentPtr Parser::ParseAssignment() {
     // TODO Implement
 }
 
-BinaryPtr Parser::ParseBinary() {
+BinaryPtr Parser::ParseBinary(ExpressionPtr left) {
     auto binary = std::make_unique<Binary>();
     binary->op = prev_token_.type;
-    Precedence right_operand_precedence = pratt_table_[binary->op].precedence;
-    // TODO: find a way to get the left operand expression
-    //binary->right_expression = std::move(ParseExpression((int)right_operand_precedence + 1));
+    auto operand_precedence = static_cast<int>(GetRule(binary->op).precedence);
+    binary->left_expression = std::move(left);
+    binary->right_expression = std::move(ParseExpression(static_cast<Precedence>(operand_precedence + 1)));
     return std::move(binary);
 }
 
@@ -182,7 +189,7 @@ GroupingPtr Parser::ParseGrouping() {
     return std::move(grouping);
 }
 
-CallPtr Parser::ParseCall() {
+CallPtr Parser::ParseCall(ExpressionPtr left) {
     // TODO Implement
 }
 
