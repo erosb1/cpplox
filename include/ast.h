@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <variant>
 
 #include "ast.h"
 #include "lexer.h"
@@ -150,7 +151,7 @@ public:
 
 class Literal : public Expression {
 public:
-    std::variant<double, bool, std::string, std::nullptr_t> value{};
+    std::variant<double, bool, std::string, std::monostate> value{};
     void accept(ASTVisitor &visitor) override;
 };
 

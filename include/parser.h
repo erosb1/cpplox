@@ -11,6 +11,7 @@ public:
     explicit Parser(std::string_view source_code);
     ProgramPtr GenerateAST();
 private:
+    enum class Precedence;
     // Control functions
     void Advance(); // Reads tokens until TokenType != ERROR
     void Consume(TT type, std::string_view error_msg); // Checks if cur_token_ == type, advances and creates error if not
@@ -22,12 +23,11 @@ private:
     VarDeclPtr ParseVarDecl();
     StatementPtr ParseStatement();
     ExprStmtPtr ParseExprStmt();
-    ExpressionPtr ParseExpression();
+    ExpressionPtr ParseExpression(Precedence precedence);
     AssignmentPtr ParseAssignment();
     BinaryPtr ParseBinary();
     UnaryPtr ParseUnary();
     LiteralPtr ParseLiteral();
-    LiteralPtr ParseString();
     GroupingPtr ParseGrouping();
     CallPtr ParseCall();
 
@@ -61,7 +61,7 @@ private:
         PRIMARY
     };
 
-    using ParseFn = std::function<ExpressionPtr(Parser&)>;
+    using ParseFn = std::function<ExpressionPtr()>;
     struct ParseRule {
         ParseFn prefix;
         ParseFn infix;

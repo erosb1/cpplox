@@ -10,23 +10,29 @@ Parser::Parser(std::string_view source_code)
     , panic_mode_(false)
     , had_error_(false) {
 
-    pratt_table_[TT::TRUE] = {ParseLiteral, nullptr, Precedence::NONE};
-    pratt_table_[TT::FALSE] = {ParseLiteral, nullptr, Precedence::NONE};
-    pratt_table_[TT::NIL] = {ParseLiteral, nullptr, Precedence::NONE};
-    pratt_table_[TT::STRING] = {ParseString, nullptr, Precedence::NONE};
-    pratt_table_[TT::OR] = {nullptr, ParseBinary, Precedence::OR};
-    pratt_table_[TT::AND] = {nullptr, ParseBinary, Precedence::AND};
-    pratt_table_[TT::EQUAL_EQUAL] = {nullptr, ParseBinary, Precedence::EQUALITY};
-    pratt_table_[TT::BANG_EQUAL] = {nullptr, ParseBinary, Precedence::EQUALITY};
-    pratt_table_[TT::GREATER] = {nullptr, ParseBinary, Precedence::COMPARISON};
-    pratt_table_[TT::GREATER_EQUAL] = {nullptr, ParseBinary, Precedence::COMPARISON};
-    pratt_table_[TT::LESS] = {nullptr, ParseBinary, Precedence::COMPARISON};
-    pratt_table_[TT::LESS_EQUAL] = {nullptr, ParseBinary, Precedence::COMPARISON};
-    pratt_table_[TT::PLUS] = {nullptr, ParseBinary, Precedence::TERM};
-    pratt_table_[TT::MINUS] = {ParseUnary, ParseBinary, Precedence::TERM};
-    pratt_table_[TT::STAR] = {nullptr, ParseBinary, Precedence::FACTOR};
-    pratt_table_[TT::SLASH] = {nullptr, ParseBinary, Precedence::FACTOR};
-    pratt_table_[TT::LEFT_PAREN] = {ParseGrouping, ParseCall, Precedence::CALL};
+    auto parseLiteral = std::bind(&Parser::ParseLiteral, this);
+    auto parseBinary = std::bind(&Parser::ParseBinary, this);
+    auto parseUnary = std::bind(&Parser::ParseUnary, this);
+    auto parseGrouping = std::bind(&Parser::ParseGrouping, this);
+    auto parseCall = std::bind(&Parser::ParseCall, this);
+
+    pratt_table_[TT::TRUE]          = {parseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::FALSE]         = {parseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::NIL]           = {parseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::STRING]        = {parseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::OR]            = {nullptr, parseBinary, Precedence::OR};
+    pratt_table_[TT::AND]           = {nullptr, parseBinary, Precedence::AND};
+    pratt_table_[TT::EQUAL_EQUAL]   = {nullptr, parseBinary, Precedence::EQUALITY};
+    pratt_table_[TT::BANG_EQUAL]    = {nullptr, parseBinary, Precedence::EQUALITY};
+    pratt_table_[TT::GREATER]       = {nullptr, parseBinary, Precedence::COMPARISON};
+    pratt_table_[TT::GREATER_EQUAL] = {nullptr, parseBinary, Precedence::COMPARISON};
+    pratt_table_[TT::LESS]          = {nullptr, parseBinary, Precedence::COMPARISON};
+    pratt_table_[TT::LESS_EQUAL]    = {nullptr, parseBinary, Precedence::COMPARISON};
+    pratt_table_[TT::PLUS]          = {nullptr, parseBinary, Precedence::TERM};
+    pratt_table_[TT::MINUS]         = {parseUnary, parseBinary, Precedence::TERM};
+    pratt_table_[TT::STAR]          = {nullptr, parseBinary, Precedence::FACTOR};
+    pratt_table_[TT::SLASH]         = {nullptr, parseBinary, Precedence::FACTOR};
+    pratt_table_[TT::LEFT_PAREN]    = {parseGrouping, parseCall, Precedence::CALL};
 }
 
 ProgramPtr Parser::GenerateAST() {
@@ -83,7 +89,7 @@ VarDeclPtr Parser::ParseVarDecl() {
     auto varDecl = std::make_unique<VarDecl>();
     varDecl->variable_name = ParseIdentifier("Expected a variable name");
     if (Match(TT::EQUAL)) {
-        varDecl-> expression = ParseExpression();
+        varDecl-> expression = ParseExpression(Precedence::ASSIGNMENT);
     } else {
         varDecl->expression = nullptr;
     }
@@ -101,15 +107,28 @@ StatementPtr Parser::ParseStatement() {
 
 ExprStmtPtr Parser::ParseExprStmt() {
     auto expr_stmt = std::make_unique<ExprStmt>();
-    expr_stmt->expression = ParseExpression();
+    expr_stmt->expression = ParseExpression(Precedence::ASSIGNMENT);
     Consume(TT::SEMICOLON, "Expected ; after expression.");
     return std::move(expr_stmt);
 }
 
-ExpressionPtr Parser::ParseExpression() {
-    // TODO Finish this function
-    auto expression = std::make_unique<Expression>();
-    return std::move(expression);
+ExpressionPtr Parser::ParseExpression(Precedence precedence) {
+    Advance();
+    if (!pratt_table_.contains(prev_token_.type)) {
+        ErrorAtCur("Expect expression");
+        return nullptr;
+    }
+
+    auto prefixFn = pratt_table_.at(prev_token_.type).prefix;
+    auto left = prefixFn();
+
+    while (precedence <= pratt_table_.at(cur_token_.type).precedence) {
+        Advance();
+        auto infixFn = pratt_table_.at(prev_token_.type).infix;
+        left = infixFn(std::move(left));
+    }
+
+    return std::move(left);
 }
 
 AssignmentPtr Parser::ParseAssignment() {
@@ -117,23 +136,50 @@ AssignmentPtr Parser::ParseAssignment() {
 }
 
 BinaryPtr Parser::ParseBinary() {
-    // TODO Implement
+    auto binary = std::make_unique<Binary>();
+    binary->op = prev_token_.type;
+    Precedence right_operand_precedence = pratt_table_[binary->op].precedence;
+    // TODO: find a way to get the left operand expression
+    //binary->right_expression = std::move(ParseExpression((int)right_operand_precedence + 1));
+    return std::move(binary);
 }
 
 UnaryPtr Parser::ParseUnary() {
-    // TODO Implement
+    auto unary = std::make_unique<Unary>();
+    unary->op = prev_token_.type;
+    //unary->expression = ParseExpression(Precedence::UNARY);
+    return std::move(unary);
 }
 
 LiteralPtr Parser::ParseLiteral() {
-    // TODO Implement
-}
-
-LiteralPtr Parser::ParseString() {
-    // TODO Implement
+    auto literal = std::make_unique<Literal>();
+    switch (prev_token_.type) {
+        case TT::TRUE:
+            literal->value = true;
+            break;
+        case TT::FALSE:
+            literal->value = false;
+            break;
+        case TT::NIL:
+            literal->value = std::monostate{};
+            break;
+        case TT::STRING:
+            literal->value = std::string(prev_token_.lexeme);
+            break;
+        case TT::NUMBER:
+            literal->value = std::stod(std::string(prev_token_.lexeme));
+            break;
+        default:
+            ErrorAt(prev_token_, "Invalid literal");
+        return std::move(literal);
+    }
 }
 
 GroupingPtr Parser::ParseGrouping() {
-    // TODO Implement
+    auto grouping = std::make_unique<Grouping>();
+    grouping->expression = ParseExpression(Precedence::ASSIGNMENT);
+    Consume(TT::RIGHT_PAREN, "Expected ending ')' after expression");
+    return std::move(grouping);
 }
 
 CallPtr Parser::ParseCall() {
