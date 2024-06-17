@@ -46,7 +46,7 @@ ProgramPtr Parser::GenerateAST() {
     auto ast = std::make_unique<Program>();
 
     Advance();
-    while (cur_token_.type != TokenType::ERROR) {
+    while (cur_token_.type != TokenType::END) {
         ast->declarations.push_back(std::move(ParseDeclaration()));
     }
 
@@ -104,7 +104,8 @@ DeclarationPtr Parser::ParseDeclaration() {
 
 VarDeclPtr Parser::ParseVarDecl() {
     auto varDecl = std::make_unique<VarDecl>();
-    varDecl->variable_name = ParseIdentifier();
+    Consume(TT::IDENTIFIER, "Expected identifier after 'var'");
+    varDecl->variable = ParseIdentifier();
     if (Match(TT::EQUAL)) {
         varDecl-> expression = ParsePrecedence(Precedence::ASSIGNMENT);
     } else {
@@ -133,9 +134,20 @@ IfStmtPtr Parser::ParseIfStmt() {
     return std::move(if_stmt);
 }
 
+BlockPtr Parser::ParseBlock() {
+    auto block = std::make_unique<Block>();
+    while (!Check(TT::RIGHT_BRACE) && !Check(TT::END)) {
+        block->declarations.push_back(std::move(ParseDeclaration()));
+    }
+    Consume(TT::RIGHT_BRACE, "Expected ending }");
+    return std::move(block);
+}
+
 StatementPtr Parser::ParseStatement() {
     if (Match(TT::IF)) {
         return std::move(ParseIfStmt());
+    } else if (Match(TT::LEFT_BRACE)) {
+        return std::move(ParseBlock());
     } else {
         return std::move(ParseExprStmt());
     }
@@ -143,7 +155,7 @@ StatementPtr Parser::ParseStatement() {
 
 ExprStmtPtr Parser::ParseExprStmt() {
     auto expr_stmt = std::make_unique<ExprStmt>();
-    expr_stmt->expression = ParsePrecedence(Precedence::ASSIGNMENT);
+    expr_stmt->expression = std::move(ParsePrecedence(Precedence::ASSIGNMENT));
     Consume(TT::SEMICOLON, "Expected ; after expression.");
     return std::move(expr_stmt);
 }
@@ -166,9 +178,6 @@ ExpressionPtr Parser::ParsePrecedence(Precedence precedence) {
 
     while (pratt_table_.contains(cur_token_.type) && precedence <= GetRule(cur_token_.type).precedence) {
         Advance();
-        if (prev_token_.type == TT::STAR) {
-            int x = 0;
-        }
         auto infixFn = GetRule(prev_token_.type).infix;
         left = infixFn(std::move(left));
     }

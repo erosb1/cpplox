@@ -19,6 +19,7 @@ class VarDecl;
 class Statement;
 class ExprStmt;
 class IfStmt;
+class Block;
 class Expression;
 class Assignment;
 class Binary;
@@ -36,6 +37,7 @@ using VarDeclPtr = std::unique_ptr<VarDecl>;
 using StatementPtr = std::unique_ptr<Statement>; // Abstract class
 using ExprStmtPtr = std::unique_ptr<ExprStmt>;
 using IfStmtPtr = std::unique_ptr<IfStmt>;
+using BlockPtr = std::unique_ptr<Block>;
 using ExpressionPtr = std::unique_ptr<Expression>; // Abstract class
 using AssignmentPtr = std::unique_ptr<Assignment>;
 using BinaryPtr = std::unique_ptr<Binary>;
@@ -59,6 +61,7 @@ public:
     virtual void visit(VarDecl &node) = 0;
     virtual void visit(ExprStmt &node) = 0;
     virtual void visit(IfStmt &node) = 0;
+    virtual void visit(Block &node) = 0;
     virtual void visit(Assignment &node) = 0;
     virtual void visit(Binary &node) = 0;
     virtual void visit(Unary &node) = 0;
@@ -88,7 +91,7 @@ public:
 
 class VarDecl : public Declaration {
 public:
-    IdentifierPtr variable_name;
+    IdentifierPtr variable;
     ExpressionPtr expression;
     void accept(ASTVisitor &visitor) override;
 };
@@ -109,6 +112,12 @@ public:
     ExpressionPtr condition;
     StatementPtr if_body;
     StatementPtr else_body;
+    void accept(ASTVisitor &visitor) override;
+};
+
+class Block : public Statement {
+public:
+    std::vector<DeclarationPtr> declarations;
     void accept(ASTVisitor &visitor) override;
 };
 
@@ -168,6 +177,7 @@ inline void FunDecl::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void VarDecl::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void ExprStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void IfStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
+inline void Block::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Assignment::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Binary::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Unary::accept(ASTVisitor &visitor) { visitor.visit(*this); }

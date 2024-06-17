@@ -7,8 +7,9 @@
 
 int main() {
     std::string source_code = R"(
-    if (x + y == 15)
+    if (x + y == 15) {
         var y = 3;
+    }
     )";
     Parser parser(source_code);
     auto ast = parser.GenerateAST();

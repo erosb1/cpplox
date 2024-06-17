@@ -93,17 +93,25 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
         std::cout << spacing << "},\n";
     } else if (const auto* varDecl = dynamic_cast<const VarDecl*>(node)) {
         std::cout << spacing << "VarDecl {\n"
-                  << spacing2 << "variable_name: \"" << varDecl->variable_name << "\",\n";
+                  << spacing2 << "variable_name: \"" << varDecl->variable->name << "\",\n";
         PrintAST(varDecl->expression.get(), indent_level + 1);
         std::cout << spacing << "},\n";
     } else if (const auto* ifStmt = dynamic_cast<const IfStmt*>(node)) {
         std::cout << spacing << "IfStmt {\n"
                  << spacing2 << "condition: \n";
-        PrintAST(ifStmt->condition.get());
+        PrintAST(ifStmt->condition.get(), indent_level + 1);
         std::cout << spacing2 << "if_body: \n";
-        PrintAST(ifStmt->if_body.get());
-        std::cout << spacing2 << "else_body: \n";
-        PrintAST(ifStmt->else_body.get());
+        PrintAST(ifStmt->if_body.get(), indent_level + 1);
+        if (ifStmt->else_body != nullptr) {
+            std::cout << spacing2 << "else_body: \n";
+            PrintAST(ifStmt->else_body.get(), indent_level + 1);
+        }
+        std::cout << spacing << "},\n";
+    } else if (const auto* block = dynamic_cast<const Block*>(node)) {
+        std::cout << spacing << "Block {\n";
+        for (auto& declaration : block->declarations) {
+            PrintAST(declaration.get(), indent_level + 1);
+        }
         std::cout << spacing << "},\n";
     } else if (const auto* binary = dynamic_cast<const Binary*>(node)) {
         std::cout << spacing << "Binary {\n"
