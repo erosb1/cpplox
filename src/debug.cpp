@@ -96,6 +96,15 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
                   << spacing2 << "variable_name: \"" << varDecl->variable_name << "\",\n";
         PrintAST(varDecl->expression.get(), indent_level + 1);
         std::cout << spacing << "},\n";
+    } else if (const auto* ifStmt = dynamic_cast<const IfStmt*>(node)) {
+        std::cout << spacing << "IfStmt {\n"
+                 << spacing2 << "condition: \n";
+        PrintAST(ifStmt->condition.get());
+        std::cout << spacing2 << "if_body: \n";
+        PrintAST(ifStmt->if_body.get());
+        std::cout << spacing2 << "else_body: \n";
+        PrintAST(ifStmt->else_body.get());
+        std::cout << spacing << "},\n";
     } else if (const auto* binary = dynamic_cast<const Binary*>(node)) {
         std::cout << spacing << "Binary {\n"
                   << spacing2 << "op: " << GetTokenString(binary->op) << ",\n"

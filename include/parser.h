@@ -44,11 +44,14 @@ private:
     // ParseRules
     ParseRule GetRule(TokenType type);
 
-    // Parsing Specific NodeTypes
+    // Statements
     DeclarationPtr ParseDeclaration();
     VarDeclPtr ParseVarDecl();
+    IfStmtPtr ParseIfStmt();
     StatementPtr ParseStatement();
     ExprStmtPtr ParseExprStmt();
+
+    // Expressions
     ExpressionPtr ParsePrecedence(Precedence precedence);
     AssignmentPtr ParseAssignment(ExpressionPtr left);
     BinaryPtr ParseBinary(ExpressionPtr left);

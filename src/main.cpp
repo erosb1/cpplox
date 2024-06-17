@@ -6,10 +6,13 @@
 #include "debug.h"
 
 int main() {
-    std::string source_code = "bitch = dog + food";
+    std::string source_code = R"(
+    if (x + y == 15)
+        var y = 3;
+    )";
     Parser parser(source_code);
-    auto expression = parser.ParseExpression();
-    Debug::PrintAST(expression.get());
+    auto ast = parser.GenerateAST();
+    Debug::PrintAST(ast.get());
     //std::cout << Debug::GetExpressionStr(expression.get()) << std::endl;
     return 0;
 }

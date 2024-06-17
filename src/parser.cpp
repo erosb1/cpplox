@@ -114,9 +114,28 @@ VarDeclPtr Parser::ParseVarDecl() {
     return std::move(varDecl);
 }
 
+IfStmtPtr Parser::ParseIfStmt() {
+    auto if_stmt = std::make_unique<IfStmt>();
+
+    // Parse condition
+    Consume(TT::LEFT_PAREN, "Expected ( after if");
+    if_stmt->condition = std::move(ParsePrecedence(Precedence::ASSIGNMENT));
+    Consume(TT::RIGHT_PAREN, "Expected ) after if condition");
+
+    // Parse body
+    if_stmt->if_body = std::move(ParseStatement());
+
+    // Parse else body
+    if (Match(TT::ELSE)) {
+        if_stmt->else_body = std::move(ParseStatement());
+    }
+
+    return std::move(if_stmt);
+}
+
 StatementPtr Parser::ParseStatement() {
     if (Match(TT::IF)) {
-        // return std::move(ParseIfStmt());
+        return std::move(ParseIfStmt());
     } else {
         return std::move(ParseExprStmt());
     }
@@ -159,7 +178,7 @@ ExpressionPtr Parser::ParsePrecedence(Precedence precedence) {
 
 AssignmentPtr Parser::ParseAssignment(ExpressionPtr left) {
     auto assign = std::make_unique<Assignment>();
-    if (const auto* identifier = dynamic_cast<const Identifier*>(left.get())) {
+    if (const auto* _identifier = dynamic_cast<const Identifier*>(left.get())) {
         assign->variable = std::unique_ptr<Identifier>(static_cast<Identifier*>(left.release()));
         assign->expression = std::move(ParsePrecedence(Precedence::ASSIGNMENT));
     } else {
