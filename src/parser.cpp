@@ -14,6 +14,7 @@ Parser::Parser(std::string_view source_code)
 
     auto parseLiteral = std::bind(&Parser::ParseLiteral, this);
     auto parseIdentifier = std::bind(&Parser::ParseIdentifier, this);
+    auto parseAssignment = std::bind(&Parser::ParseAssignment, this, std::placeholders::_1);
     auto parseBinary = std::bind(&Parser::ParseBinary, this, std::placeholders::_1);
     auto parseUnary = std::bind(&Parser::ParseUnary, this);
     auto parseGrouping = std::bind(&Parser::ParseGrouping, this);
@@ -25,6 +26,7 @@ Parser::Parser(std::string_view source_code)
     pratt_table_[TT::STRING]        = {parseLiteral, nullptr, Precedence::NONE};
     pratt_table_[TT::NUMBER]        = {parseLiteral, nullptr, Precedence::NONE};
     pratt_table_[TT::IDENTIFIER]    = {parseIdentifier, nullptr, Precedence::NONE};
+    pratt_table_[TT::EQUAL]         = {nullptr, parseAssignment, Precedence::ASSIGNMENT};
     pratt_table_[TT::OR]            = {nullptr, parseBinary, Precedence::OR};
     pratt_table_[TT::AND]           = {nullptr, parseBinary, Precedence::AND};
     pratt_table_[TT::EQUAL_EQUAL]   = {nullptr, parseBinary, Precedence::EQUALITY};
@@ -155,8 +157,15 @@ ExpressionPtr Parser::ParsePrecedence(Precedence precedence) {
     return std::move(left);
 }
 
-AssignmentPtr Parser::ParseAssignment() {
-    // TODO Implement
+AssignmentPtr Parser::ParseAssignment(ExpressionPtr left) {
+    auto assign = std::make_unique<Assignment>();
+    if (const auto* identifier = dynamic_cast<const Identifier*>(left.get())) {
+        assign->variable = std::unique_ptr<Identifier>(static_cast<Identifier*>(left.release()));
+        assign->expression = std::move(ParsePrecedence(Precedence::ASSIGNMENT));
+    } else {
+        ErrorAtCur("Can only assign values to identifiers");
+    }
+    return std::move(assign);
 }
 
 BinaryPtr Parser::ParseBinary(ExpressionPtr left) {

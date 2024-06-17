@@ -6,7 +6,7 @@
 #include "debug.h"
 
 int main() {
-    std::string source_code = "a + b * c - jshf and j";
+    std::string source_code = "bitch = dog + food";
     Parser parser(source_code);
     auto expression = parser.ParseExpression();
     Debug::PrintAST(expression.get());

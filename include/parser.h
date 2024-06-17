@@ -50,7 +50,7 @@ private:
     StatementPtr ParseStatement();
     ExprStmtPtr ParseExprStmt();
     ExpressionPtr ParsePrecedence(Precedence precedence);
-    AssignmentPtr ParseAssignment();
+    AssignmentPtr ParseAssignment(ExpressionPtr left);
     BinaryPtr ParseBinary(ExpressionPtr left);
     UnaryPtr ParseUnary();
     LiteralPtr ParseLiteral();

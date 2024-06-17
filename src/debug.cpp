@@ -116,8 +116,15 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
                  << spacing << "},\n";
     } else if (const auto* identifier = dynamic_cast<const Identifier*>(node)) {
         std::cout << spacing << "Identifier {\n"
-                 << spacing2 << "name; " << identifier->name << ",\n"
+                 << spacing2 << "name: " << identifier->name << ",\n"
                  << spacing << "},\n";
+    } else if (const auto* assignment = dynamic_cast<const Assignment*>(node)) {
+        std::cout << spacing << "Assignment {\n"
+                 << spacing2 << "variable: \n";
+        PrintAST(assignment->variable.get(), indent_level + 1);
+        std::cout << spacing2 << "expression: \n";
+        PrintAST(assignment->expression.get(), indent_level + 1);
+        std::cout << spacing << "},\n";
     } else {
         std::cout << spacing << "Unknown ASTNode type {}, \n";
     }
