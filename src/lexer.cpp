@@ -24,6 +24,7 @@ std::vector<Token> Lexer::TokenizeAll() {
 }
 
 Token Lexer::ReadNextToken() {
+    SkipWhitespace();
     start_index_ = cur_index_;
     char c = Advance();
 

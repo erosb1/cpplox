@@ -51,6 +51,11 @@ ProgramPtr Parser::GenerateAST() {
     return std::move(ast);
 }
 
+ExpressionPtr Parser::ParseExpression() {
+    Advance();
+    return std::move(ParsePrecedence(Precedence::ASSIGNMENT));
+}
+
 void Parser::Advance() {
     prev_token_ = cur_token_;
 
@@ -99,7 +104,7 @@ VarDeclPtr Parser::ParseVarDecl() {
     auto varDecl = std::make_unique<VarDecl>();
     varDecl->variable_name = ParseIdentifier();
     if (Match(TT::EQUAL)) {
-        varDecl-> expression = ParseExpression(Precedence::ASSIGNMENT);
+        varDecl-> expression = ParsePrecedence(Precedence::ASSIGNMENT);
     } else {
         varDecl->expression = nullptr;
     }
@@ -117,12 +122,12 @@ StatementPtr Parser::ParseStatement() {
 
 ExprStmtPtr Parser::ParseExprStmt() {
     auto expr_stmt = std::make_unique<ExprStmt>();
-    expr_stmt->expression = ParseExpression(Precedence::ASSIGNMENT);
+    expr_stmt->expression = ParsePrecedence(Precedence::ASSIGNMENT);
     Consume(TT::SEMICOLON, "Expected ; after expression.");
     return std::move(expr_stmt);
 }
 
-ExpressionPtr Parser::ParseExpression(Precedence precedence) {
+ExpressionPtr Parser::ParsePrecedence(Precedence precedence) {
     Advance();
     if (!pratt_table_.contains(prev_token_.type)) {
         ErrorAt(prev_token_, "Expect expression");
@@ -159,14 +164,14 @@ BinaryPtr Parser::ParseBinary(ExpressionPtr left) {
     binary->op = prev_token_.type;
     auto operand_precedence = static_cast<int>(GetRule(binary->op).precedence);
     binary->left_expression = std::move(left);
-    binary->right_expression = std::move(ParseExpression(static_cast<Precedence>(operand_precedence + 1)));
+    binary->right_expression = std::move(ParsePrecedence(static_cast<Precedence>(operand_precedence + 1)));
     return std::move(binary);
 }
 
 UnaryPtr Parser::ParseUnary() {
     auto unary = std::make_unique<Unary>();
     unary->op = prev_token_.type;
-    unary->expression = std::move(ParseExpression(Precedence::UNARY));
+    unary->expression = std::move(ParsePrecedence(Precedence::UNARY));
     return std::move(unary);
 }
 
@@ -195,7 +200,7 @@ LiteralPtr Parser::ParseLiteral() {
 }
 
 ExpressionPtr Parser::ParseGrouping() {
-    auto expression = std::move(ParseExpression(Precedence::ASSIGNMENT));
+    auto expression = std::move(ParsePrecedence(Precedence::ASSIGNMENT));
     Consume(TT::RIGHT_PAREN, "Expected ending ')' after expression");
     return std::move(expression);
 }

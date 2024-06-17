@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(LexerStrings) {
 
     const std::vector<std::string> expectedLexemes = {
         "\"this is a string\"", "while", "(", "true", ")", "{", "hello", "23", "}",
-        "\" this is a \n multiline string \"", "\" this is an unterminated string", ""
+        "\" this is a \n multiline string \"", "Unterminated String", ""
     };
 
     const std::vector<Token> tokens = lexer.TokenizeAll();

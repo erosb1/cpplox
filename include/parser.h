@@ -10,6 +10,7 @@ class Parser {
 public:
     explicit Parser(std::string_view source_code);
     ProgramPtr GenerateAST();
+    ExpressionPtr ParseExpression();
 private:
     // Pratt Parsing
     enum class Precedence {
@@ -48,7 +49,7 @@ private:
     VarDeclPtr ParseVarDecl();
     StatementPtr ParseStatement();
     ExprStmtPtr ParseExprStmt();
-    ExpressionPtr ParseExpression(Precedence precedence);
+    ExpressionPtr ParsePrecedence(Precedence precedence);
     AssignmentPtr ParseAssignment();
     BinaryPtr ParseBinary(ExpressionPtr left);
     UnaryPtr ParseUnary();
