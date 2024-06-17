@@ -46,6 +46,7 @@ private:
 
     // Statements
     DeclarationPtr ParseDeclaration();
+    FunDeclPtr ParseFunDecl();
     VarDeclPtr ParseVarDecl();
     IfStmtPtr ParseIfStmt();
     PrintStmtPtr ParsePrintStmt();
@@ -64,6 +65,9 @@ private:
     ExpressionPtr ParseGrouping();
     CallPtr ParseCall(ExpressionPtr left);
     IdentifierPtr ParseIdentifier();
+
+    // Parse Other
+    ParametersPtr ParseParameters();
 
     // Error Handling
     void ErrorAt(Token& token, std::string msg);

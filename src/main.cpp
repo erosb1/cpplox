@@ -7,8 +7,8 @@
 
 int main() {
     std::string source_code = R"(
-    while (true) {
-        print "annoyting msg";
+    fun add() {
+        return a + b;
     }
     )";
     Parser parser(source_code);

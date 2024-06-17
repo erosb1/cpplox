@@ -91,6 +91,15 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
             PrintAST(declaration.get(), indent_level + 1);
         }
         std::cout << spacing << "},\n";
+    } else if (const auto* funDecl = dynamic_cast<const FunDecl*>(node)) {
+        std::cout << spacing << "FunDecl {\n"
+                  << spacing2 << "name: " << funDecl->name->name << ",\n"
+                  << spacing2 << "parameters: {\n";
+        if (funDecl->parameters != nullptr )PrintAST(funDecl->parameters.get(), indent_level + 2);
+        std::cout << spacing2 << "},\n"
+                  << spacing2 << "body: \n";
+        PrintAST(funDecl->body.get(), indent_level + 1);
+        std::cout << spacing << "},\n";
     } else if (const auto* varDecl = dynamic_cast<const VarDecl*>(node)) {
         std::cout << spacing << "VarDecl {\n"
                   << spacing2 << "variable_name: \"" << varDecl->variable->name << "\",\n";
@@ -161,6 +170,10 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
         std::cout << spacing2 << "expression: \n";
         PrintAST(assignment->expression.get(), indent_level + 1);
         std::cout << spacing << "},\n";
+    } else if (const auto* parameters = dynamic_cast<const Parameters*>(node)) {
+        for (auto& identifier : parameters->identifiers) {
+            PrintAST(identifier.get(), indent_level + 1);
+        }
     } else {
         std::cout << spacing << "Unknown ASTNode type {}, \n";
     }

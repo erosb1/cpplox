@@ -95,11 +95,30 @@ Parser::ParseRule Parser::GetRule(TokenType type) {
 }
 
 DeclarationPtr Parser::ParseDeclaration() {
-    if (Match(TT::VAR)) {
+    if (Match(TT::FUN)) {
+        return std::move(ParseFunDecl());
+    } else if (Match(TT::VAR)) {
         return std::move(ParseVarDecl());
     } else {
         return std::move(ParseStatement());
     }
+}
+
+FunDeclPtr Parser::ParseFunDecl() {
+    auto function = std::make_unique<FunDecl>();
+
+    Consume(TT::IDENTIFIER, "Expected function name");
+    function->name = std::move(ParseIdentifier());
+
+    Consume(TT::LEFT_PAREN, "Expected ( after function identifier");
+    if (!Check(TT::RIGHT_PAREN)) {
+        function->parameters = std::move(ParseParameters());
+    }
+    Consume(TT::RIGHT_PAREN, "Expected closing ) after function parameters");
+
+    Consume(TT::LEFT_BRACE, "Expect opening {");
+    function->body = std::move(ParseBlock());
+    return std::move(function);
 }
 
 VarDeclPtr Parser::ParseVarDecl() {
@@ -286,6 +305,16 @@ IdentifierPtr Parser::ParseIdentifier() {
     auto identifier = std::make_unique<Identifier>();
     identifier->name = prev_token_.lexeme;
     return std::move(identifier);
+}
+
+ParametersPtr Parser::ParseParameters() {
+    auto parameters = std::make_unique<Parameters>();
+    for (Advance(); prev_token_.type == TT::IDENTIFIER; Advance()) {
+        parameters->identifiers.push_back(std::move(ParseIdentifier()));
+        if (Check(TT::RIGHT_PAREN)) break;
+        Consume(TT::COMMA, "Expect , after parameter");
+    }
+    return std::move(parameters);
 }
 
 void Parser::ErrorAt(Token &token, std::string msg) {

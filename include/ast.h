@@ -30,7 +30,8 @@ class Unary;
 class Call;
 class Identifier;
 class Literal;
-class Function;
+class Parameters;
+class Arguments;
 
 using ASTNodePtr = std::unique_ptr<ASTNode>;
 using ProgramPtr = std::unique_ptr<Program>;
@@ -51,7 +52,8 @@ using UnaryPtr = std::unique_ptr<Unary>;
 using CallPtr = std::unique_ptr<Call>;
 using IdentifierPtr = std::unique_ptr<Identifier>;
 using LiteralPtr = std::unique_ptr<Literal>;
-using FunctionPtr = std::unique_ptr<Function>;
+using ParametersPtr = std::unique_ptr<Parameters>;
+using ArgumentsPtr = std::unique_ptr<Arguments>;
 
 class ASTNode {
 public:
@@ -77,7 +79,8 @@ public:
     virtual void visit(Call &node) = 0;
     virtual void visit(Identifier &node) = 0;
     virtual void visit(Literal &node) = 0;
-    virtual void visit(Function &node) = 0;
+    virtual void visit(Parameters &node) = 0;
+    virtual void visit(Arguments &node) = 0;
 };
 
 class Program : public ASTNode {
@@ -93,8 +96,9 @@ public:
 
 class FunDecl : public Declaration {
 public:
-    FunctionPtr function;
-    ~FunDecl() override = default;
+    IdentifierPtr name;
+    ParametersPtr parameters;
+    BlockPtr body;
     void accept(ASTVisitor &visitor) override;
 };
 
@@ -195,8 +199,15 @@ public:
     void accept(ASTVisitor &visitor) override;
 };
 
-class Function : public ASTNode {
+class Parameters : public ASTNode {
 public:
+    std::vector<IdentifierPtr> identifiers;
+    void accept(ASTVisitor &visitor) override;
+};
+
+class Arguments : public ASTNode {
+public:
+    std::vector<ExpressionPtr> expressions;
     void accept(ASTVisitor &visitor) override;
 };
 
@@ -215,6 +226,7 @@ inline void Unary::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Call::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Identifier::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Literal::accept(ASTVisitor &visitor) { visitor.visit(*this); }
-inline void Function::accept(ASTVisitor &visitor) { visitor.visit(*this); }
+inline void Parameters::accept(ASTVisitor &visitor) { visitor.visit(*this); }
+inline void Arguments::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 
 #endif //AST_H
