@@ -140,9 +140,10 @@ public:
     void accept(ASTVisitor &visitor) override;
 };
 
+using Value = std::variant<double, bool, std::string, std::monostate>;
 class Literal : public Expression {
 public:
-    std::variant<double, bool, std::string, std::monostate> value{};
+    Value value{};
     void accept(ASTVisitor &visitor) override;
 };
 

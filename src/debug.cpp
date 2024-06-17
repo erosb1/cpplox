@@ -90,3 +90,68 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
         std::cout << spacing << "Unknown ASTNode type {}, \n";
     }
 }
+
+
+static std::string GetOperator(TokenType type) {
+    switch (type) {
+        case TokenType::PLUS: return "+";
+        case TokenType::MINUS: return "-";
+        case TokenType::STAR: return "*";
+        case TokenType::SLASH: return "/";
+        case TokenType::AND: return "&&";
+        case TokenType::OR: return "||";
+        case TokenType::EQUAL: return "=";
+        case TokenType::EQUAL_EQUAL: return "==";
+        case TokenType::BANG: return "!";
+        case TokenType::BANG_EQUAL: return "!=";
+        case TokenType::GREATER: return ">";
+        case TokenType::GREATER_EQUAL: return ">=";
+        case TokenType::LESS: return "<";
+        case TokenType::LESS_EQUAL: return "<=";
+        default: return "?";
+    }
+}
+
+static std::string WrapWithParen(std::string str) {
+    return "(" + str + ")";
+}
+
+static std::string VariantToString(const Value& var) {
+    return std::visit([&](auto&& arg) -> std::string {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, std::string>) {
+            return arg;
+        } else if constexpr (std::is_same_v<T, double>) {
+            return std::to_string(arg);
+        } else if constexpr (std::is_same_v<T, bool>) {
+            if (std::get<bool>(var) == true) return "true";
+            return "false";
+        } else return "nil";
+    }, var);
+}
+
+static std::string CreateExprString(const ASTNode* const expression) {
+    if (const auto* literal = dynamic_cast<const Literal*>(expression)) {
+        return VariantToString(literal->value);
+    }
+    if (const auto* identifier = dynamic_cast<const Identifier*>(expression)) {
+        return std::string(identifier->name);
+    }
+    if (const auto* binary = dynamic_cast<const Binary*>(expression)) {
+        return WrapWithParen(CreateExprString(binary->left_expression.get()) +
+            " " + GetOperator(binary->op) + " " +
+                CreateExprString(binary->right_expression.get()));
+    }
+    if (const auto* unary = dynamic_cast<const Unary*>(expression)) {
+        return WrapWithParen(GetOperator(unary->op) + CreateExprString(unary->expression.get()));
+    }
+    return "(Unknown Expression)";
+}
+
+void Debug::PrintExpressionParen(const ASTNode* const expression) {
+    std::string expr = CreateExprString(expression);
+    if (expr.size() > 2 && expr[0] == '(') {
+        expr = expr.substr(1, expr.size() - 2);
+    }
+    std::cout << expr << std::endl;
+}
