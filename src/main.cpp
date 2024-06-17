@@ -6,9 +6,10 @@
 #include "debug.h"
 
 int main() {
-    std::string source_code = "fibe +";
+    std::string source_code = "a + b * c - jshf and j";
     Parser parser(source_code);
     auto expression = parser.ParseExpression();
-    std::cout << Debug::GetExpressionStr(expression.get()) << std::endl;
+    Debug::PrintAST(expression.get());
+    //std::cout << Debug::GetExpressionStr(expression.get()) << std::endl;
     return 0;
 }

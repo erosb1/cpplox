@@ -206,7 +206,7 @@ ExpressionPtr Parser::ParseGrouping() {
 }
 
 CallPtr Parser::ParseCall(ExpressionPtr left) {
-    // TODO Implement
+
 }
 
 IdentifierPtr Parser::ParseIdentifier() {

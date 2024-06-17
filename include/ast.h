@@ -129,7 +129,7 @@ public:
 };
 
 class Call : public Expression {
-    IdentifierPtr callee;
+    ExpressionPtr callee;
     //ArgumentsPtr arguments;
     void accept(ASTVisitor &visitor) override;
 };

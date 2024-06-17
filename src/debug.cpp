@@ -46,6 +46,20 @@ static std::string GetTokenString(TokenType type) {
     }
 }
 
+static std::string VariantToString(const Value& var) {
+    return std::visit([&](auto&& arg) -> std::string {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, std::string>) {
+            return arg;
+        } else if constexpr (std::is_same_v<T, double>) {
+            return std::to_string(arg);
+        } else if constexpr (std::is_same_v<T, bool>) {
+            if (std::get<bool>(var) == true) return "true";
+            return "false";
+        } else return "nil";
+    }, var);
+}
+
 std::ostream& operator<<(std::ostream& os, const TokenType& type) {
     os << GetTokenString(type);
     return os;
@@ -82,10 +96,28 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
                   << spacing2 << "variable_name: \"" << varDecl->variable_name << "\",\n";
         PrintAST(varDecl->expression.get(), indent_level + 1);
         std::cout << spacing << "},\n";
-    } else if (const auto* expr = dynamic_cast<const Expression*>(node)) {
-        std::cout << spacing << "Expression: {\n"
-                  << spacing2 << " {{ Insert Expression Stuff }}\n"
-                  << spacing << "},\n";
+    } else if (const auto* binary = dynamic_cast<const Binary*>(node)) {
+        std::cout << spacing << "Binary {\n"
+                  << spacing2 << "op: " << GetTokenString(binary->op) << ",\n"
+                  << spacing2 << "left_expression: \n";
+        PrintAST(binary->left_expression.get(), indent_level + 1);
+        std::cout << spacing2 << "right_expression: \n";
+        PrintAST(binary->right_expression.get(), indent_level + 1);
+        std::cout << spacing << "},\n";
+    } else if (const auto* unary = dynamic_cast<const Unary*>(node)) {
+        std::cout << spacing << "Unary {\n"
+                 << spacing2 << "op: " << GetTokenString(unary->op) << ",\n"
+                 << spacing2 << "expression: \n";
+        PrintAST(unary->expression.get(), indent_level + 1);
+        std::cout << spacing << "},\n";
+    } else if (const auto* literal = dynamic_cast<const Literal*>(node)) {
+        std::cout << spacing << "Literal {\n"
+                 << spacing2 << "value: " << VariantToString(literal->value) << ",\n"
+                 << spacing << "},\n";
+    } else if (const auto* identifier = dynamic_cast<const Identifier*>(node)) {
+        std::cout << spacing << "Identifier {\n"
+                 << spacing2 << "name; " << identifier->name << ",\n"
+                 << spacing << "},\n";
     } else {
         std::cout << spacing << "Unknown ASTNode type {}, \n";
     }
@@ -113,20 +145,6 @@ static std::string GetOperator(TokenType type) {
 
 static std::string WrapWithParen(std::string str) {
     return "(" + str + ")";
-}
-
-static std::string VariantToString(const Value& var) {
-    return std::visit([&](auto&& arg) -> std::string {
-        using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, std::string>) {
-            return arg;
-        } else if constexpr (std::is_same_v<T, double>) {
-            return std::to_string(arg);
-        } else if constexpr (std::is_same_v<T, bool>) {
-            if (std::get<bool>(var) == true) return "true";
-            return "false";
-        } else return "nil";
-    }, var);
 }
 
 static std::string CreateExprString(const Expression* const expression) {
