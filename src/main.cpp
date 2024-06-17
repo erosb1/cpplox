@@ -6,7 +6,7 @@
 #include "debug.h"
 
 int main() {
-    std::string source_code = "a + b";
+    std::string source_code = "a + b * c";
     Parser parser(source_code);
     auto ast = parser.GenerateAST();
     Debug::PrintAST(ast.get());

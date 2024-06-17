@@ -71,6 +71,7 @@ Token Lexer::ReadNextToken() {
             return CreateToken(TT::LESS);
         }
         case '"': return ReadString();
+        case '\0': return CreateToken(TT::END);
         default: return CreateErrorToken("Invalid Character");
     }
 }

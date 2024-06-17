@@ -53,15 +53,13 @@ private:
     BinaryPtr ParseBinary(ExpressionPtr left);
     UnaryPtr ParseUnary();
     LiteralPtr ParseLiteral();
-    GroupingPtr ParseGrouping();
+    ExpressionPtr ParseGrouping();
     CallPtr ParseCall(ExpressionPtr left);
-
-    // Parse smaller stuff
-    std::string_view ParseIdentifier(std::string_view error_msg);
+    IdentifierPtr ParseIdentifier();
 
     // Error Handling
-    void ErrorAt(Token& token, std::string_view msg);
-    void ErrorAtCur(std::string_view msg);
+    void ErrorAt(Token& token, std::string msg);
+    void ErrorAtCur(std::string msg);
     void Synchronize();
 private:
     Lexer lexer_;

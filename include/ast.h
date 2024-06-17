@@ -22,7 +22,6 @@ class Expression;
 class Assignment;
 class Binary;
 class Unary;
-class Grouping;
 class Call;
 class Identifier;
 class Literal;
@@ -39,7 +38,6 @@ using ExpressionPtr = std::unique_ptr<Expression>; // Abstract class
 using AssignmentPtr = std::unique_ptr<Assignment>;
 using BinaryPtr = std::unique_ptr<Binary>;
 using UnaryPtr = std::unique_ptr<Unary>;
-using GroupingPtr = std::unique_ptr<Grouping>;
 using CallPtr = std::unique_ptr<Call>;
 using IdentifierPtr = std::unique_ptr<Identifier>;
 using LiteralPtr = std::unique_ptr<Literal>;
@@ -61,7 +59,6 @@ public:
     virtual void visit(Assignment &node) = 0;
     virtual void visit(Binary &node) = 0;
     virtual void visit(Unary &node) = 0;
-    virtual void visit(Grouping &node) = 0;
     virtual void visit(Call &node) = 0;
     virtual void visit(Identifier &node) = 0;
     virtual void visit(Literal &node) = 0;
@@ -88,7 +85,7 @@ public:
 
 class VarDecl : public Declaration {
 public:
-    std::string variable_name;
+    IdentifierPtr variable_name;
     ExpressionPtr expression;
     void accept(ASTVisitor &visitor) override;
 };
@@ -131,12 +128,6 @@ public:
     void accept(ASTVisitor &visitor) override;
 };
 
-class Grouping : public Expression {
-public:
-    ExpressionPtr expression;
-    void accept(ASTVisitor &visitor) override;
-};
-
 class Call : public Expression {
     IdentifierPtr callee;
     //ArgumentsPtr arguments;
@@ -167,7 +158,6 @@ inline void ExprStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Assignment::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Binary::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Unary::accept(ASTVisitor &visitor) { visitor.visit(*this); }
-inline void Grouping::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Call::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Identifier::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Literal::accept(ASTVisitor &visitor) { visitor.visit(*this); }

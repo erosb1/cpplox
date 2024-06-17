@@ -27,7 +27,7 @@ enum class TokenType {
     FOR, FUN, IF, NIL, OR,
     PRINT, RETURN,
     TRUE, VAR, WHILE,
-    ERROR,
+    ERROR, NONE,
     END,
 };
 

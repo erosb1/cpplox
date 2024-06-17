@@ -7,12 +7,13 @@
 
 Parser::Parser(std::string_view source_code)
     : lexer_(source_code)
-    , prev_token_(TT::ERROR, "", -1)
-    , cur_token_(TT::ERROR, "", -1)
+    , prev_token_(TT::NONE, "", -1)
+    , cur_token_(TT::NONE, "", -1)
     , panic_mode_(false)
     , had_error_(false) {
 
     auto parseLiteral = std::bind(&Parser::ParseLiteral, this);
+    auto parseIdentifier = std::bind(&Parser::ParseIdentifier, this);
     auto parseBinary = std::bind(&Parser::ParseBinary, this, std::placeholders::_1);
     auto parseUnary = std::bind(&Parser::ParseUnary, this);
     auto parseGrouping = std::bind(&Parser::ParseGrouping, this);
@@ -22,6 +23,8 @@ Parser::Parser(std::string_view source_code)
     pratt_table_[TT::FALSE]         = {parseLiteral, nullptr, Precedence::NONE};
     pratt_table_[TT::NIL]           = {parseLiteral, nullptr, Precedence::NONE};
     pratt_table_[TT::STRING]        = {parseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::NUMBER]        = {parseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::IDENTIFIER]    = {parseIdentifier, nullptr, Precedence::NONE};
     pratt_table_[TT::OR]            = {nullptr, parseBinary, Precedence::OR};
     pratt_table_[TT::AND]           = {nullptr, parseBinary, Precedence::AND};
     pratt_table_[TT::EQUAL_EQUAL]   = {nullptr, parseBinary, Precedence::EQUALITY};
@@ -55,7 +58,7 @@ void Parser::Advance() {
     while (true) {
         cur_token_ = lexer_.ReadNextToken();
         if (cur_token_.type != TT::ERROR) break;
-        // ErrorAtCur(token_.lexeme);
+        ErrorAtCur(std::string(cur_token_.lexeme));
     }
 }
 
@@ -64,7 +67,7 @@ void Parser::Consume(TT type, std::string_view error_msg) {
         Advance();
         return;
     }
-    ErrorAtCur(error_msg);
+    ErrorAtCur(std::string(error_msg));
 }
 
 bool Parser::Check(TT type) const {
@@ -88,13 +91,13 @@ DeclarationPtr Parser::ParseDeclaration() {
     if (Match(TT::VAR)) {
         return std::move(ParseVarDecl());
     } else {
-        return ParseStatement();
+        return std::move(ParseStatement());
     }
 }
 
 VarDeclPtr Parser::ParseVarDecl() {
     auto varDecl = std::make_unique<VarDecl>();
-    varDecl->variable_name = ParseIdentifier("Expected a variable name");
+    varDecl->variable_name = ParseIdentifier();
     if (Match(TT::EQUAL)) {
         varDecl-> expression = ParseExpression(Precedence::ASSIGNMENT);
     } else {
@@ -122,15 +125,24 @@ ExprStmtPtr Parser::ParseExprStmt() {
 ExpressionPtr Parser::ParseExpression(Precedence precedence) {
     Advance();
     if (!pratt_table_.contains(prev_token_.type)) {
-        ErrorAtCur("Expect expression");
+        ErrorAt(prev_token_, "Expect expression");
         return nullptr;
     }
 
     auto prefixFn = GetRule(prev_token_.type).prefix;
+
+    if (prefixFn == nullptr) {
+        ErrorAt(prev_token_, "Cannot start expression with: " + std::string(prev_token_.lexeme));
+        return nullptr;
+    }
+
     auto left = prefixFn();
 
-    while (precedence <= GetRule(cur_token_.type).precedence) {
+    while (pratt_table_.contains(cur_token_.type) && precedence <= GetRule(cur_token_.type).precedence) {
         Advance();
+        if (prev_token_.type == TT::STAR) {
+            int x = 0;
+        }
         auto infixFn = GetRule(prev_token_.type).infix;
         left = infixFn(std::move(left));
     }
@@ -154,7 +166,7 @@ BinaryPtr Parser::ParseBinary(ExpressionPtr left) {
 UnaryPtr Parser::ParseUnary() {
     auto unary = std::make_unique<Unary>();
     unary->op = prev_token_.type;
-    //unary->expression = ParseExpression(Precedence::UNARY);
+    unary->expression = std::move(ParseExpression(Precedence::UNARY));
     return std::move(unary);
 }
 
@@ -178,27 +190,27 @@ LiteralPtr Parser::ParseLiteral() {
             break;
         default:
             ErrorAt(prev_token_, "Invalid literal");
-        return std::move(literal);
     }
+    return std::move(literal);
 }
 
-GroupingPtr Parser::ParseGrouping() {
-    auto grouping = std::make_unique<Grouping>();
-    grouping->expression = ParseExpression(Precedence::ASSIGNMENT);
+ExpressionPtr Parser::ParseGrouping() {
+    auto expression = std::move(ParseExpression(Precedence::ASSIGNMENT));
     Consume(TT::RIGHT_PAREN, "Expected ending ')' after expression");
-    return std::move(grouping);
+    return std::move(expression);
 }
 
 CallPtr Parser::ParseCall(ExpressionPtr left) {
     // TODO Implement
 }
 
-std::string_view Parser::ParseIdentifier(std::string_view error_msg) {
-    Consume(TT::IDENTIFIER, error_msg);
-    return prev_token_.lexeme;
+IdentifierPtr Parser::ParseIdentifier() {
+    auto identifier = std::make_unique<Identifier>();
+    identifier->name = prev_token_.lexeme;
+    return std::move(identifier);
 }
 
-void Parser::ErrorAt(Token &token, std::string_view msg) {
+void Parser::ErrorAt(Token &token, std::string msg) {
     if (panic_mode_) return;
     panic_mode_ = true;
     had_error_ = true;
@@ -206,7 +218,7 @@ void Parser::ErrorAt(Token &token, std::string_view msg) {
     std::cerr << error_type << " at line: " << token.line << "\n\t" << msg << "\n";
 }
 
-void Parser::ErrorAtCur(std::string_view msg) {
+void Parser::ErrorAtCur(std::string msg) {
     ErrorAt(cur_token_, msg);
 }
 
