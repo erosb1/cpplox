@@ -150,6 +150,20 @@ ReturnStmtPtr Parser::ParseReturnStmt() {
     return std::move(return_stmt);
 }
 
+WhileStmtPtr Parser::ParseWhileStmt() {
+    auto while_stmt = std::make_unique<WhileStmt>();
+
+    // Parse condition
+    Consume(TT::LEFT_PAREN, "Expected ( after while");
+    while_stmt->condition = std::move(ParsePrecedence(Precedence::ASSIGNMENT));
+    Consume(TT::RIGHT_PAREN, "Expected ) after while condition");
+
+    // Parse body
+    while_stmt->body = std::move(ParseStatement());
+
+    return std::move(while_stmt);
+}
+
 BlockPtr Parser::ParseBlock() {
     auto block = std::make_unique<Block>();
     while (!Check(TT::RIGHT_BRACE) && !Check(TT::END)) {
@@ -166,6 +180,8 @@ StatementPtr Parser::ParseStatement() {
         return std::move(ParsePrintStmt());
     } else if (Match(TT::RETURN)) {
         return std::move(ParseReturnStmt());
+    } else if (Match(TT::WHILE)) {
+        return std::move(ParseWhileStmt());
     } else if (Match(TT::LEFT_BRACE)) {
         return std::move(ParseBlock());
     } else {

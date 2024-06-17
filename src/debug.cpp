@@ -119,6 +119,13 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
             PrintAST(returnStmt->expression.get(), indent_level + 1);
         }
         std::cout << spacing << "},\n";
+    } else if (const auto* whileStmt = dynamic_cast<const WhileStmt*>(node)) {
+        std::cout << spacing << "WhileStmt {\n"
+                << spacing2 << "condition: \n";
+        PrintAST(whileStmt->condition.get(), indent_level + 1);
+        std::cout << spacing2 << "body: \n";
+        PrintAST(whileStmt->body.get(), indent_level + 1);
+        std::cout << spacing << "},\n";
     } else if (const auto* block = dynamic_cast<const Block*>(node)) {
         std::cout << spacing << "Block {\n";
         for (auto& declaration : block->declarations) {

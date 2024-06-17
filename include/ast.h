@@ -21,6 +21,7 @@ class ExprStmt;
 class IfStmt;
 class PrintStmt;
 class ReturnStmt;
+class WhileStmt;
 class Block;
 class Expression;
 class Assignment;
@@ -41,6 +42,7 @@ using ExprStmtPtr = std::unique_ptr<ExprStmt>;
 using IfStmtPtr = std::unique_ptr<IfStmt>;
 using PrintStmtPtr = std::unique_ptr<PrintStmt>;
 using ReturnStmtPtr = std::unique_ptr<ReturnStmt>;
+using WhileStmtPtr = std::unique_ptr<WhileStmt>;
 using BlockPtr = std::unique_ptr<Block>;
 using ExpressionPtr = std::unique_ptr<Expression>; // Abstract class
 using AssignmentPtr = std::unique_ptr<Assignment>;
@@ -67,6 +69,7 @@ public:
     virtual void visit(IfStmt &node) = 0;
     virtual void visit(PrintStmt &node) = 0;
     virtual void visit(ReturnStmt &node) = 0;
+    virtual void visit(WhileStmt &node) = 0;
     virtual void visit(Block &node) = 0;
     virtual void visit(Assignment &node) = 0;
     virtual void visit(Binary &node) = 0;
@@ -130,6 +133,13 @@ public:
 class ReturnStmt : public Statement {
 public:
     ExpressionPtr expression;
+    void accept(ASTVisitor &visitor) override;
+};
+
+class WhileStmt : public Statement {
+public:
+    ExpressionPtr condition;
+    StatementPtr body;
     void accept(ASTVisitor &visitor) override;
 };
 
@@ -197,6 +207,7 @@ inline void ExprStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void IfStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void PrintStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void ReturnStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
+inline void WhileStmt::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Block::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Assignment::accept(ASTVisitor &visitor) { visitor.visit(*this); }
 inline void Binary::accept(ASTVisitor &visitor) { visitor.visit(*this); }

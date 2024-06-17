@@ -50,6 +50,7 @@ private:
     IfStmtPtr ParseIfStmt();
     PrintStmtPtr ParsePrintStmt();
     ReturnStmtPtr ParseReturnStmt();
+    WhileStmtPtr ParseWhileStmt();
     BlockPtr ParseBlock();
     StatementPtr ParseStatement();
     ExprStmtPtr ParseExprStmt();

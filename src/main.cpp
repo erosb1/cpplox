@@ -7,8 +7,8 @@
 
 int main() {
     std::string source_code = R"(
-    if (x + y == 15) {
-        return;
+    while (true) {
+        print "annoyting msg";
     }
     )";
     Parser parser(source_code);
