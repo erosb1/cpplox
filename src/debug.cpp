@@ -91,15 +91,14 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
     }
 }
 
-
 static std::string GetOperator(TokenType type) {
     switch (type) {
         case TokenType::PLUS: return "+";
         case TokenType::MINUS: return "-";
         case TokenType::STAR: return "*";
         case TokenType::SLASH: return "/";
-        case TokenType::AND: return "&&";
-        case TokenType::OR: return "||";
+        case TokenType::AND: return "and";
+        case TokenType::OR: return "or";
         case TokenType::EQUAL: return "=";
         case TokenType::EQUAL_EQUAL: return "==";
         case TokenType::BANG: return "!";
@@ -130,7 +129,7 @@ static std::string VariantToString(const Value& var) {
     }, var);
 }
 
-static std::string CreateExprString(const ASTNode* const expression) {
+static std::string CreateExprString(const Expression* const expression) {
     if (const auto* literal = dynamic_cast<const Literal*>(expression)) {
         return VariantToString(literal->value);
     }
@@ -148,10 +147,11 @@ static std::string CreateExprString(const ASTNode* const expression) {
     return "(Unknown Expression)";
 }
 
-void Debug::PrintExpressionParen(const ASTNode* const expression) {
+std::string Debug::GetExpressionStr(const Expression* const expression) {
     std::string expr = CreateExprString(expression);
     if (expr.size() > 2 && expr[0] == '(') {
         expr = expr.substr(1, expr.size() - 2);
     }
-    std::cout << expr << std::endl;
+    return expr;
 }
+

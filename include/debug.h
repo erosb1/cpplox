@@ -9,7 +9,7 @@
 namespace Debug {
     void PrintTokens(const std::vector<Token>& tokens);
     void PrintAST(const ASTNode* head, size_t indent_level = 0);
-    void PrintExpressionParen(const ASTNode* expression);
+    std::string GetExpressionStr(const Expression* expression);
 }
 
 // Used for printing TokenTypes in unit tests
