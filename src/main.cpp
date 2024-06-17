@@ -8,7 +8,7 @@
 int main() {
     std::string source_code = R"(
     if (x + y == 15) {
-        print 45 + 23;
+        return;
     }
     )";
     Parser parser(source_code);

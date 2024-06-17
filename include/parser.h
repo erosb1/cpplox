@@ -49,6 +49,7 @@ private:
     VarDeclPtr ParseVarDecl();
     IfStmtPtr ParseIfStmt();
     PrintStmtPtr ParsePrintStmt();
+    ReturnStmtPtr ParseReturnStmt();
     BlockPtr ParseBlock();
     StatementPtr ParseStatement();
     ExprStmtPtr ParseExprStmt();

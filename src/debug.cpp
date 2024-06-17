@@ -112,6 +112,13 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
                  << spacing2 << "expression: \n";
         PrintAST(printStmt->expression.get(), indent_level + 1);
         std::cout << spacing << "},\n";
+    } else if (const auto* returnStmt = dynamic_cast<const ReturnStmt*>(node)) {
+        std::cout << spacing << "ReturnStmt {\n";
+        if (returnStmt->expression != nullptr) {
+            std::cout << spacing2 << "expression: \n";
+            PrintAST(returnStmt->expression.get(), indent_level + 1);
+        }
+        std::cout << spacing << "},\n";
     } else if (const auto* block = dynamic_cast<const Block*>(node)) {
         std::cout << spacing << "Block {\n";
         for (auto& declaration : block->declarations) {
