@@ -134,6 +134,13 @@ IfStmtPtr Parser::ParseIfStmt() {
     return std::move(if_stmt);
 }
 
+PrintStmtPtr Parser::ParsePrintStmt() {
+    auto print_stmt = std::make_unique<PrintStmt>();
+    print_stmt->expression = std::move(ParsePrecedence(Precedence::ASSIGNMENT));
+    Consume(TT::SEMICOLON, "Expected ; after print expression");
+    return std::move(print_stmt);
+}
+
 BlockPtr Parser::ParseBlock() {
     auto block = std::make_unique<Block>();
     while (!Check(TT::RIGHT_BRACE) && !Check(TT::END)) {
@@ -146,6 +153,8 @@ BlockPtr Parser::ParseBlock() {
 StatementPtr Parser::ParseStatement() {
     if (Match(TT::IF)) {
         return std::move(ParseIfStmt());
+    } else if (Match(TT::PRINT)) {
+        return std::move(ParsePrintStmt());
     } else if (Match(TT::LEFT_BRACE)) {
         return std::move(ParseBlock());
     } else {
