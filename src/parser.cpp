@@ -301,7 +301,9 @@ CallPtr Parser::ParseCall(ExpressionPtr left) {
     auto call = std::make_unique<Call>();
     if (const auto* _identifier = dynamic_cast<const Identifier*>(left.get())) {
         call->callee = std::unique_ptr<Identifier>(static_cast<Identifier*>(left.release()));
-        call->arguments = std::move(ParseArguments());
+        if (!Check(TT::RIGHT_PAREN)) {
+            call->arguments = std::move(ParseArguments());
+        }
         Consume(TT::RIGHT_PAREN, "Expected ) after arguments");
     } else {
         ErrorAtCur("Can only call functions");

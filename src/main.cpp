@@ -7,11 +7,22 @@
 
 int main() {
     std::string source_code = R"(
-    functino();
+        fun add(a, b) {
+            return a + b;
+        }
+
+        fun main() {
+            print("Enter two numbers");
+            var a = prompt();
+            var b = prompt();
+            print("The sum is " + add(a, b) + ".");
+        }
     )";
     Parser parser(source_code);
     auto ast = parser.GenerateAST();
-    Debug::PrintAST(ast.get());
-    //std::cout << Debug::GetExpressionStr(expression.get()) << std::endl;
+    Debug::ASTStringVisitor visitor;
+    ast->accept(visitor);
+    std::cout << visitor.GetString() << std::endl;
+
     return 0;
 }

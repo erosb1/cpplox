@@ -72,6 +72,213 @@ static void PrintToken(const Token& token, size_t last_line_num) {
         << token_type_str << "    " << std::setw(8) << token.lexeme << '\n';
 }
 
+Debug::ASTStringVisitor::ASTStringVisitor()
+    : cur_indent_("") {}
+
+std::string Debug::ASTStringVisitor::GetString() const {
+    return oss_.str();
+}
+
+void Debug::ASTStringVisitor::visit(Program &node) {
+    GrowIndent();
+    oss_ << "Program <list> [\n";
+    for (auto& declaration : node.declarations) {
+        oss_ << cur_indent_;
+        declaration->accept(*this);
+    }
+    ShrinkIndent();
+    oss_ << cur_indent_ << "],\n";
+}
+
+void Debug::ASTStringVisitor::visit(FunDecl &node) {
+    GrowIndent();
+    oss_ << "FunDecl {\n"
+         << cur_indent_ << "name: ";
+    node.name->accept(*this);
+    if (node.parameters != nullptr) {
+        oss_ << cur_indent_ << "parameters: ";
+        node.parameters->accept(*this);
+    } else {
+        oss_ << cur_indent_ << "parameters: { none },\n";
+    }
+    oss_ << cur_indent_ << "body: ";
+    node.body->accept(*this);
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(VarDecl &node) {
+    GrowIndent();
+    oss_ << "VarDecl {\n"
+         << cur_indent_ << "variable: ";
+    node.variable->accept(*this);
+    if (node.expression != nullptr) {
+        oss_ << cur_indent_ << "expression: ";
+        node.expression->accept(*this);
+    } else {
+        oss_ << cur_indent_ << "expression: { none },\n";
+    }
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(ExprStmt &node) {
+    GrowIndent();
+    oss_ << "ExprStmt {\n";
+    oss_ << cur_indent_ << "expression: ";
+    node.expression->accept(*this);
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(IfStmt &node) {
+    GrowIndent();
+    oss_ << "IfStmt {\n"
+         << cur_indent_ << "condition: ";
+    node.condition->accept(*this);
+    oss_ << cur_indent_ << "if-body: ";
+    node.if_body->accept(*this);
+    if (node.else_body != nullptr) {
+        oss_ << cur_indent_ << "else-body: ";
+        node.else_body->accept(*this);
+    } else {
+        oss_ << cur_indent_ << "else-body: { none },\n";
+    }
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(PrintStmt &node) {
+    GrowIndent();
+    oss_ << "PrintStmt {\n"
+         << cur_indent_ << "expression: ";
+    node.expression->accept(*this);
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(ReturnStmt &node) {
+    GrowIndent();
+    oss_ << "ReturnStmt {\n";
+    if (node.expression != nullptr) {
+        oss_ << cur_indent_ << "expression: ";
+        node.expression->accept(*this);
+    } else {
+        oss_ << cur_indent_ << "expression: { none },\n";
+    }
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(WhileStmt &node) {
+    GrowIndent();
+    oss_ << "WhileStmt {\n"
+         << cur_indent_ << "condition: ";
+    node.condition->accept(*this);
+    oss_ << cur_indent_ << "body: ";
+    node.body->accept(*this);
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(Block &node) {
+    GrowIndent();
+    oss_ << "Block <list> [\n";
+    for (auto& declaration : node.declarations) {
+        oss_ << cur_indent_;
+        declaration->accept(*this);
+    }
+    ShrinkIndent();
+    oss_ << cur_indent_ << "],\n";
+}
+
+void Debug::ASTStringVisitor::visit(Assignment &node) {
+    GrowIndent();
+    oss_ << "Assignment {\n"
+         << cur_indent_ << "variable: ";
+    node.variable->accept(*this);
+    oss_ << cur_indent_ << "expression: ";
+    node.expression->accept(*this);
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(Binary &node) {
+    GrowIndent();
+    oss_ << "Binary {\n"
+         << cur_indent_ << "op: " << GetTokenString(node.op) << ",\n"
+         << cur_indent_ << "left_expression: ";
+    node.left_expression->accept(*this);
+    oss_ << cur_indent_ << "right_expression: ";
+    node.right_expression->accept(*this);
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(Unary &node) {
+    GrowIndent();
+    oss_ << "Unary {\n"
+         << cur_indent_ << "op: " << GetTokenString(node.op) << ",\n"
+         << cur_indent_ << "expression: ";
+    node.expression->accept(*this);
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(Call &node) {
+    GrowIndent();
+    oss_ << "Call {\n";
+    oss_ << cur_indent_<< "callee: ";
+    node.callee->accept(*this);
+    if (node.arguments != nullptr) {
+        oss_ << cur_indent_ << "arguments: ";
+        node.arguments->accept(*this);
+    } else {
+        oss_ << cur_indent_ << "arguments: { none },\n";
+    }
+    ShrinkIndent();
+    oss_ << cur_indent_ << "},\n";
+}
+
+void Debug::ASTStringVisitor::visit(Identifier &node) {
+    oss_ << "Identifier { name: " << node.name << " },\n";
+}
+
+void Debug::ASTStringVisitor::visit(Literal &node) {
+    oss_ << "Literal { value: " << VariantToString(node.value) << " },\n";
+}
+
+void Debug::ASTStringVisitor::visit(Parameters &node) {
+    GrowIndent();
+    oss_ << "Parameters <list> [\n";
+    for (auto& identifier : node.identifiers) {
+        oss_ << cur_indent_;
+        identifier->accept(*this);
+    }
+    ShrinkIndent();
+    oss_ << cur_indent_ << "],\n";
+}
+
+void Debug::ASTStringVisitor::visit(Arguments &node) {
+    GrowIndent();
+    oss_ << "Arguments <list> [\n";
+    for (auto& expression : node.expressions) {
+        oss_ << cur_indent_;
+        expression->accept(*this);
+    }
+    ShrinkIndent();
+    oss_ << cur_indent_ << "],\n";
+}
+
+void Debug::ASTStringVisitor::GrowIndent() {
+    cur_indent_ += std::string(indent_size_, ' ');
+}
+
+void Debug::ASTStringVisitor::ShrinkIndent() {
+    int new_indent_size = std::max(0, static_cast<int>(cur_indent_.size()) - indent_size_);
+    cur_indent_ = std::string(new_indent_size, ' ');
+}
+
 void Debug::PrintTokens(const std::vector<Token> &tokens) {
     std::cout << "[line]    [TokenType]       [lexeme]\n";
     size_t last_line_num = -1;
@@ -82,109 +289,45 @@ void Debug::PrintTokens(const std::vector<Token> &tokens) {
     std::cout << std::endl;
 }
 
-void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
-    auto spacing = std::string(indent_level * AST_INDENT_SPACING, ' ');
-    auto spacing2 = spacing + std::string(AST_INDENT_SPACING, ' ');
-    if (const auto* program = dynamic_cast<const Program*>(node)) {
-        std::cout << spacing << "Program {\n";
-        for (auto& declaration : program->declarations) {
-            PrintAST(declaration.get(), indent_level + 1);
-        }
-        std::cout << spacing << "},\n";
-    } else if (const auto* exprStmt = dynamic_cast<const ExprStmt*>(node)) {
-        std::cout << spacing << "ExprStmt { \n"
-                  << spacing2 << "expression: \n";
-        PrintAST(exprStmt->expression.get(), indent_level +1 );
-        std::cout << spacing << "},\n";
-    } else if (const auto* funDecl = dynamic_cast<const FunDecl*>(node)) {
-        std::cout << spacing << "FunDecl {\n"
-                  << spacing2 << "name: " << funDecl->name->name << ",\n"
-                  << spacing2 << "parameters: {\n";
-        if (funDecl->parameters != nullptr )PrintAST(funDecl->parameters.get(), indent_level + 2);
-        std::cout << spacing2 << "},\n"
-                  << spacing2 << "body: \n";
-        PrintAST(funDecl->body.get(), indent_level + 1);
-        std::cout << spacing << "},\n";
-    } else if (const auto* varDecl = dynamic_cast<const VarDecl*>(node)) {
-        std::cout << spacing << "VarDecl {\n"
-                  << spacing2 << "variable_name: \"" << varDecl->variable->name << "\",\n";
-        PrintAST(varDecl->expression.get(), indent_level + 1);
-        std::cout << spacing << "},\n";
-    } else if (const auto* ifStmt = dynamic_cast<const IfStmt*>(node)) {
-        std::cout << spacing << "IfStmt {\n"
-                 << spacing2 << "condition: \n";
-        PrintAST(ifStmt->condition.get(), indent_level + 1);
-        std::cout << spacing2 << "if_body: \n";
-        PrintAST(ifStmt->if_body.get(), indent_level + 1);
-        if (ifStmt->else_body != nullptr) {
-            std::cout << spacing2 << "else_body: \n";
-            PrintAST(ifStmt->else_body.get(), indent_level + 1);
-        }
-        std::cout << spacing << "},\n";
-    } else if (const auto* printStmt = dynamic_cast<const PrintStmt*>(node)) {
-        std::cout << spacing << "PrintStmt {\n"
-                 << spacing2 << "expression: \n";
-        PrintAST(printStmt->expression.get(), indent_level + 1);
-        std::cout << spacing << "},\n";
-    } else if (const auto* returnStmt = dynamic_cast<const ReturnStmt*>(node)) {
-        std::cout << spacing << "ReturnStmt {\n";
-        if (returnStmt->expression != nullptr) {
-            std::cout << spacing2 << "expression: \n";
-            PrintAST(returnStmt->expression.get(), indent_level + 1);
-        }
-        std::cout << spacing << "},\n";
-    } else if (const auto* whileStmt = dynamic_cast<const WhileStmt*>(node)) {
-        std::cout << spacing << "WhileStmt {\n"
-                << spacing2 << "condition: \n";
-        PrintAST(whileStmt->condition.get(), indent_level + 1);
-        std::cout << spacing2 << "body: \n";
-        PrintAST(whileStmt->body.get(), indent_level + 1);
-        std::cout << spacing << "},\n";
-    } else if (const auto* block = dynamic_cast<const Block*>(node)) {
-        std::cout << spacing << "Block {\n";
-        for (auto& declaration : block->declarations) {
-            PrintAST(declaration.get(), indent_level + 1);
-        }
-        std::cout << spacing << "},\n";
-    } else if (const auto* binary = dynamic_cast<const Binary*>(node)) {
-        std::cout << spacing << "Binary {\n"
-                  << spacing2 << "op: " << GetTokenString(binary->op) << ",\n"
-                  << spacing2 << "left_expression: \n";
-        PrintAST(binary->left_expression.get(), indent_level + 1);
-        std::cout << spacing2 << "right_expression: \n";
-        PrintAST(binary->right_expression.get(), indent_level + 1);
-        std::cout << spacing << "},\n";
-    } else if (const auto* unary = dynamic_cast<const Unary*>(node)) {
-        std::cout << spacing << "Unary {\n"
-                 << spacing2 << "op: " << GetTokenString(unary->op) << ",\n"
-                 << spacing2 << "expression: \n";
-        PrintAST(unary->expression.get(), indent_level + 1);
-        std::cout << spacing << "},\n";
-    } else if (const auto* literal = dynamic_cast<const Literal*>(node)) {
-        std::cout << spacing << "Literal {\n"
-                 << spacing2 << "value: " << VariantToString(literal->value) << ",\n"
-                 << spacing << "},\n";
-    } else if (const auto* identifier = dynamic_cast<const Identifier*>(node)) {
-        std::cout << spacing << "Identifier {\n"
-                 << spacing2 << "name: " << identifier->name << ",\n"
-                 << spacing << "},\n";
-    } else if (const auto* assignment = dynamic_cast<const Assignment*>(node)) {
-        std::cout << spacing << "Assignment {\n"
-                 << spacing2 << "variable: \n";
-        PrintAST(assignment->variable.get(), indent_level + 1);
-        std::cout << spacing2 << "expression: \n";
-        PrintAST(assignment->expression.get(), indent_level + 1);
-        std::cout << spacing << "},\n";
-    } else if (const auto* parameters = dynamic_cast<const Parameters*>(node)) {
-        for (auto& identifier : parameters->identifiers) {
-            PrintAST(identifier.get(), indent_level + 1);
-        }
-    } else if (const auto* call = dynamic_cast<const Call*>(node)) {
-        std::cout << spacing << "Call {\n"
-                 << spacing2 << "callee: " << call->callee->name;
-    } else {
-        std::cout << spacing << "Unknown ASTNode type {}, \n";
+std::string Debug::GetASTString(ASTNode* const node) {
+    ASTStringVisitor visitor;
+    if (auto* program = dynamic_cast<Program*>(node)) {
+        program->accept(visitor);
+    } else if (auto* fun_decl = dynamic_cast<FunDecl*>(node)) {
+        fun_decl->accept(visitor);
+    } else if (auto* var_decl = dynamic_cast<VarDecl*>(node)) {
+        var_decl->accept(visitor);
+    } else if (auto* expr_stmt = dynamic_cast<ExprStmt*>(node)) {
+        expr_stmt->accept(visitor);
+    } else if (auto* if_stmt = dynamic_cast<IfStmt*>(node)) {
+        if_stmt->accept(visitor);
+    } else if (auto* print_stmt = dynamic_cast<PrintStmt*>(node)) {
+        print_stmt->accept(visitor);
+    } else if (auto* return_stmt = dynamic_cast<ReturnStmt*>(node)) {
+        return_stmt->accept(visitor);
+    } else if (auto* while_stmt = dynamic_cast<WhileStmt*>(node)) {
+        while_stmt->accept(visitor);
+    } else if (auto* block = dynamic_cast<Block*>(node)) {
+        block->accept(visitor);
+    } else if (auto* assignment = dynamic_cast<Assignment*>(node)) {
+        assignment->accept(visitor);
+    } else if (auto* binary = dynamic_cast<Binary*>(node)) {
+        binary->accept(visitor);
+    } else if (auto* unary = dynamic_cast<Unary*>(node)) {
+        unary->accept(visitor);
+    } else if (auto* call = dynamic_cast<Call*>(node)) {
+        call->accept(visitor);
+    } else if (auto* identifier = dynamic_cast<Identifier*>(node)) {
+        identifier->accept(visitor);
+    } else if (auto* literal = dynamic_cast<Literal*>(node)) {
+        literal->accept(visitor);
+    } else if (auto* parameters = dynamic_cast<Parameters*>(node)) {
+        parameters->accept(visitor);
+    } else if (auto* arguments = dynamic_cast<Arguments*>(node)) {
+        arguments->accept(visitor);
     }
+
+    return visitor.GetString();
 }
 
 static std::string GetOperator(TokenType type) {
