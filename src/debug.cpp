@@ -91,6 +91,11 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
             PrintAST(declaration.get(), indent_level + 1);
         }
         std::cout << spacing << "},\n";
+    } else if (const auto* exprStmt = dynamic_cast<const ExprStmt*>(node)) {
+        std::cout << spacing << "ExprStmt { \n"
+                  << spacing2 << "expression: \n";
+        PrintAST(exprStmt->expression.get(), indent_level +1 );
+        std::cout << spacing << "},\n";
     } else if (const auto* funDecl = dynamic_cast<const FunDecl*>(node)) {
         std::cout << spacing << "FunDecl {\n"
                   << spacing2 << "name: " << funDecl->name->name << ",\n"
@@ -174,6 +179,9 @@ void Debug::PrintAST(const ASTNode* const node, size_t indent_level) {
         for (auto& identifier : parameters->identifiers) {
             PrintAST(identifier.get(), indent_level + 1);
         }
+    } else if (const auto* call = dynamic_cast<const Call*>(node)) {
+        std::cout << spacing << "Call {\n"
+                 << spacing2 << "callee: " << call->callee->name;
     } else {
         std::cout << spacing << "Unknown ASTNode type {}, \n";
     }

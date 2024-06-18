@@ -7,9 +7,7 @@
 
 int main() {
     std::string source_code = R"(
-    fun add() {
-        return a + b;
-    }
+    functino();
     )";
     Parser parser(source_code);
     auto ast = parser.GenerateAST();

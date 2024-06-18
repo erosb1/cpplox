@@ -298,7 +298,15 @@ ExpressionPtr Parser::ParseGrouping() {
 }
 
 CallPtr Parser::ParseCall(ExpressionPtr left) {
-
+    auto call = std::make_unique<Call>();
+    if (const auto* _identifier = dynamic_cast<const Identifier*>(left.get())) {
+        call->callee = std::unique_ptr<Identifier>(static_cast<Identifier*>(left.release()));
+        call->arguments = std::move(ParseArguments());
+        Consume(TT::RIGHT_PAREN, "Expected ) after arguments");
+    } else {
+        ErrorAtCur("Can only call functions");
+    }
+    return std::move(call);
 }
 
 IdentifierPtr Parser::ParseIdentifier() {
@@ -315,6 +323,19 @@ ParametersPtr Parser::ParseParameters() {
         Consume(TT::COMMA, "Expect , after parameter");
     }
     return std::move(parameters);
+}
+
+ArgumentsPtr Parser::ParseArguments() {
+    auto arguments = std::make_unique<Arguments>();
+    if (!Check(TT::RIGHT_PAREN)) {
+        int arg_count = 0;
+        do {
+            arguments->expressions.push_back(std::move(ParsePrecedence((Precedence::ASSIGNMENT))));
+            if (arg_count >= 256) ErrorAtCur("Cannot have more than 256 arguments");
+            arg_count++;
+        } while (Match(TT::COMMA));
+    }
+    return std::move(arguments);
 }
 
 void Parser::ErrorAt(Token &token, std::string msg) {

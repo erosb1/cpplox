@@ -68,6 +68,7 @@ private:
 
     // Parse Other
     ParametersPtr ParseParameters();
+    ArgumentsPtr ParseArguments();
 
     // Error Handling
     void ErrorAt(Token& token, std::string msg);
@@ -79,9 +80,6 @@ private:
     Token cur_token_;
     bool panic_mode_;  // switches between true/false when encountering errors and synchronizing
     bool had_error_;   // remains true throughout entire parsing if had one error
-
-
-
 };
 
 

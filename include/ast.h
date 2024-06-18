@@ -181,8 +181,9 @@ public:
 };
 
 class Call : public Expression {
-    ExpressionPtr callee;
-    //ArgumentsPtr arguments;
+public:
+    IdentifierPtr callee;
+    ArgumentsPtr arguments;
     void accept(ASTVisitor &visitor) override;
 };
 
