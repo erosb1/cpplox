@@ -1,7 +1,9 @@
 #include "symbol_table.h"
 
-void SymbolTable::AddSymbol(std::string symbol_name, Symbol symbol) {
+bool SymbolTable::AddSymbol(std::string symbol_name, Symbol symbol) {
+    if (Contains(symbol_name)) return false;
     table_[symbol_name] = symbol;
+    return true;
 }
 
 bool SymbolTable::Contains(std::string symbol_name) const {

@@ -4,22 +4,20 @@
 #include "ast.h"
 #include "parser.h"
 #include "debug.h"
+#include "semantic_analyser.h"
 
 int main() {
     std::string source_code = R"(
-        fun add(a, b) {
-            return a + b;
-        }
+        var a = 32;
+        a;
 
-        fun main() {
-            print("Enter two numbers");
-            var a = prompt();
-            var b = prompt();
-            print("The sum is " + add(a, b) + ".");
-        }
+        { a; }
+        { var b = 32; b;}
     )";
     Parser parser(source_code);
     auto ast = parser.GenerateAST();
+    SemanticAnalyser analyser;
+    ast->accept(analyser);
     Debug::ASTStringVisitor visitor;
     ast->accept(visitor);
     std::cout << visitor.GetString() << std::endl;

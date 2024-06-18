@@ -10,13 +10,12 @@ enum class SymbolType {
 };
 
 struct Symbol {
-    std::string name;
     SymbolType type;
 };
 
 class SymbolTable {
 public:
-    void AddSymbol(std::string symbol_name, Symbol symbol);
+    bool AddSymbol(std::string symbol_name, Symbol symbol);
     [[nodiscard]] bool Contains(std::string symbol_name) const;
     [[nodiscard]] const Symbol* GetSymbol(std::string symbol_name) const;
 private:
