@@ -6,6 +6,7 @@
 
 #include "lexer.h"
 #include "ast.h"
+#include "chunk.h"
 
 namespace Debug {
     class ASTStringVisitor : public ASTVisitor {
@@ -38,6 +39,7 @@ namespace Debug {
     };
 
     void PrintTokens(const std::vector<Token>& tokens);
+    std::string GetChunkStr(const Chunk& chunk);
     std::string GetASTString(ASTNode* head);
     std::string GetExpressionStr(const Expression* expression);
 }

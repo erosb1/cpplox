@@ -4,6 +4,11 @@ void Chunk::Write(uint8_t byte) {
     code_.push_back(byte);
 }
 
-void Chunk::AddConstant(Value constant) {
+uint8_t Chunk::AddConstant(Value constant) {
     constants_.push_back(constant);
+    return constants_.size() - 1;
+}
+
+std::vector<uint8_t> Chunk::GetCode() const {
+    return code_;
 }

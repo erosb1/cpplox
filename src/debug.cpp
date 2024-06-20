@@ -49,8 +49,8 @@ static std::string GetTokenString(TokenType type) {
 static std::string VariantToString(const Value& var) {
     return std::visit([&](auto&& arg) -> std::string {
         using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, std::string>) {
-            return arg;
+        if constexpr (std::is_same_v<T, std::string_view>) {
+            return std::string(arg);
         } else if constexpr (std::is_same_v<T, double>) {
             return std::to_string(arg);
         } else if constexpr (std::is_same_v<T, bool>) {
@@ -287,6 +287,37 @@ void Debug::PrintTokens(const std::vector<Token> &tokens) {
         last_line_num = token.line;
     }
     std::cout << std::endl;
+}
+
+std::string Debug::GetChunkStr(const Chunk &chunk) {
+    std::ostringstream oss;
+    auto code = chunk.GetCode();
+    for (int i = 0; i < code.size(); i++) {
+        int col_width = 12;
+        oss << std::left << std::setw(col_width);
+        switch (auto op_code = static_cast<OP>(code[i])) {
+            case OP::CONSTANT:
+                oss << "[CONSTANT]";
+                i++;
+                oss  << static_cast<int>(code[i]) << "\n";
+                break;
+            case OP::ADD:
+                oss << "[ADD]\n";
+                break;
+            case OP::SUBTRACT:
+                oss << "[SUBTRACT]\n";
+                break;
+            case OP::MULTIPLY:
+                oss << "[MULTIPLY]\n";
+                break;
+            case OP::DIVIDE:
+                oss << "[DIVIDE]\n";
+                break;
+            default:
+                oss << "[UNKNOWN OPCODE]\n";
+        }
+    }
+    return oss.str();
 }
 
 std::string Debug::GetASTString(ASTNode* const node) {

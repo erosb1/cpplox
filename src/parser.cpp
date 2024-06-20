@@ -280,7 +280,7 @@ LiteralPtr Parser::ParseLiteral() {
             literal->value = std::monostate{};
             break;
         case TT::STRING:
-            literal->value = std::string(prev_token_.lexeme);
+            literal->value = prev_token_.lexeme;
             break;
         case TT::NUMBER:
             literal->value = std::stod(std::string(prev_token_.lexeme));
