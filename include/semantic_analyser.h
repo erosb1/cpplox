@@ -31,6 +31,7 @@ private:
     void PopScope();
     void Error(std::string msg);
     bool CheckSymbol(std::string msg);
+    const Symbol* GetSymbol(std::string msg);
 private:
     std::vector<SymbolTable> scopes_;
 };

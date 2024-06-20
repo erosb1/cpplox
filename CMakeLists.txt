@@ -27,3 +27,14 @@ target_link_libraries(clox ${Boost_LIBRARIES})
 # Include Boost directories
 target_include_directories(clox PRIVATE ${Boost_INCLUDE_DIRS})
 
+# Add a custom target to check for memory leaks
+add_custom_target(check_leaks
+        COMMAND leaks --atExit -- ./clox
+        DEPENDS clox
+        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+        COMMENT "Checking for memory leaks..."
+)
+
+# Make sure to build the program before running the leak check
+add_dependencies(check_leaks clox)
+

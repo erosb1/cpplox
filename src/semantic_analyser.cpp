@@ -14,12 +14,21 @@ void SemanticAnalyser::visit(Program &node) {
 }
 
 void SemanticAnalyser::visit(FunDecl &node) {
-    // TODO implement
+    size_t parameter_count = node.parameters == nullptr ? 0 : node.parameters->identifiers.size();
+    FunctionInfo function_info = {std::string(node.name->name), parameter_count};
+    Symbol sym = { SymbolType::FUNCTION, function_info };
+    bool result = scopes_.back().AddSymbol(std::string(node.name->name), sym);
+    if (!result) Error(std::string(node.name->name) + " is already defined");
+    PushScope();
+    if (parameter_count > 0) node.parameters->accept(*this);
+    node.body->accept(*this);
+    PopScope();
 }
 
 void SemanticAnalyser::visit(VarDecl &node) {
-    Symbol table = { SymbolType::VARIABLE };
-    bool result = scopes_.back().AddSymbol(std::string(node.variable->name), table);
+    VariableInfo variable_info = { std::string(node.variable->name) };
+    Symbol sym = { SymbolType::VARIABLE, variable_info };
+    bool result = scopes_.back().AddSymbol(std::string(node.variable->name), sym);
     if (!result) Error(std::string(node.variable->name) + " is already defined");
     node.expression->accept(*this);
 }
@@ -72,7 +81,20 @@ void SemanticAnalyser::visit(Unary &node) {
 }
 
 void SemanticAnalyser::visit(Call &node) {
-    // TODO implement
+    auto symbol = GetSymbol(std::string(node.callee->name));
+    if (symbol == nullptr) {
+        Error("Call to undefined function " + std::string(node.callee->name));
+        return;
+    }
+    if (!std::holds_alternative<FunctionInfo>(symbol->object)) {
+        Error(std::string(node.callee->name) + " is not a function");
+    }
+    auto function_info = std::get<FunctionInfo>(symbol->object);
+    size_t call_argument_count = node.arguments == nullptr ? 0 : node.arguments->expressions.size();
+    if (call_argument_count != function_info.parameter_count) {
+        Error("Invalid argument count when calling function: " + std::string(node.callee->name) +
+                    ",\n\tExpected: " + std::to_string(function_info.parameter_count) + ", Actual: " + std::to_string(call_argument_count));
+    }
 }
 
 void SemanticAnalyser::visit(Identifier &node) {
@@ -86,9 +108,15 @@ void SemanticAnalyser::visit(Literal &node) {
 }
 
 void SemanticAnalyser::visit(Parameters &node) {
+    for (auto& identifier : node.identifiers) {
+        VariableInfo variable_info = { std::string(identifier->name) };
+        Symbol symbol = { SymbolType::VARIABLE, variable_info };
+        scopes_.back().AddSymbol(std::string(identifier->name), symbol);
+    }
 }
 
 void SemanticAnalyser::visit(Arguments &node) {
+    return;
 }
 
 void SemanticAnalyser::PushScope() {
@@ -109,4 +137,13 @@ bool SemanticAnalyser::CheckSymbol(std::string symbol_name) {
         if (it->Contains(symbol_name)) return true;
     }
     return false;
+}
+
+const Symbol* SemanticAnalyser::GetSymbol(std::string symbol_name) {
+    for (auto it = scopes_.rbegin(); it != scopes_.rend(); ++it) {
+        if (it->Contains(symbol_name)) {
+            return it->GetSymbol(symbol_name);
+        }
+    }
+    return nullptr;
 }

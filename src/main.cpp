@@ -8,11 +8,11 @@
 
 int main() {
     std::string source_code = R"(
-        var a = 32;
-        a;
-
-        { a; }
-        { var b = 32; b;}
+        fun add(a, b) {
+            return a + b;
+            a;
+        }
+        print add(5,5,4);
     )";
     Parser parser(source_code);
     auto ast = parser.GenerateAST();
