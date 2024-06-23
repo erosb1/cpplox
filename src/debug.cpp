@@ -294,27 +294,14 @@ std::string Debug::GetChunkStr(const Chunk &chunk) {
     auto code = chunk.GetCode();
     for (int i = 0; i < code.size(); i++) {
         int col_width = 12;
-        oss << std::left << std::setw(col_width);
-        switch (auto op_code = static_cast<OP>(code[i])) {
-            case OP::CONSTANT:
-                oss << "[CONSTANT]";
-                i++;
-                oss  << static_cast<int>(code[i]) << "\n";
-                break;
-            case OP::ADD:
-                oss << "[ADD]\n";
-                break;
-            case OP::SUBTRACT:
-                oss << "[SUBTRACT]\n";
-                break;
-            case OP::MULTIPLY:
-                oss << "[MULTIPLY]\n";
-                break;
-            case OP::DIVIDE:
-                oss << "[DIVIDE]\n";
-                break;
-            default:
-                oss << "[UNKNOWN OPCODE]\n";
+        auto op_code = static_cast<OP>(code[i]);
+        auto& op_definition = OP_DEFINITIONS.at(op_code);
+        std::string temp = "[" + op_definition.name + "]";
+        oss << std::left << std::setw(col_width) << temp;
+
+        if (op_definition.operand_count > 0) {
+            auto operand = static_cast<int>(code[++i]);
+            oss << operand << "\n";
         }
     }
     return oss.str();

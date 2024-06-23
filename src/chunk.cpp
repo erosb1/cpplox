@@ -9,6 +9,10 @@ uint8_t Chunk::AddConstant(Value constant) {
     return constants_.size() - 1;
 }
 
-std::vector<uint8_t> Chunk::GetCode() const {
+const std::vector<uint8_t>& Chunk::GetCode() const {
     return code_;
+}
+
+const std::vector<Value> & Chunk::GetConstants() const {
+    return constants_;
 }
