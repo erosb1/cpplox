@@ -92,6 +92,27 @@ void VM::Interpret(const Chunk &chunk) {
                 if (val.IsFalsey()) PushStack(true);
                 else PushStack(false);
             } break;
+            case OP::EQUAL: {
+                Value right = PopStack();
+                Value left = PopStack();
+                PushStack(right == left);
+            } break;
+            case OP::GREATER: {
+                Value right = PopStack();
+                Value left = PopStack();
+                if (left.IsDouble() && right.IsDouble()) {
+                    PushStack(left.AsDouble() > right.AsDouble());
+                }
+                else Error("Cannot perform comparison. Invalid types: " + left.GetTypeDebugString() + " and " + right.GetTypeDebugString());
+            } break;
+            case OP::LESS: {
+                Value right = PopStack();
+                Value left = PopStack();
+                if (left.IsDouble() && right.IsDouble()) {
+                    PushStack(left.AsDouble() < right.AsDouble());
+                }
+                else Error("Cannot perform comparison. Invalid types: " + left.GetTypeDebugString() + " and " + right.GetTypeDebugString());
+            } break;
             default:
                 Error("Invalid OPCODE");
         }

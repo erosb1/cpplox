@@ -66,6 +66,12 @@ void Compiler::visit(Binary &node) {
         case TT::MINUS: Emit(OP::SUBTRACT); break;
         case TT::STAR: Emit(OP::MULTIPLY); break;
         case TT::SLASH: Emit(OP::DIVIDE); break;
+        case TT::EQUAL_EQUAL: Emit(OP::EQUAL); break;
+        case TT::BANG_EQUAL: Emit(OP::EQUAL); Emit(OP::NOT); break;
+        case TT::GREATER: Emit(OP::GREATER); break;
+        case TT::GREATER_EQUAL: Emit(OP::LESS); Emit(OP::NOT); break;
+        case TT::LESS: Emit(OP::LESS); break;
+        case TT::LESS_EQUAL: Emit(OP::GREATER); Emit(OP::NOT); break;
         default:
             throw std::invalid_argument("Invalid binary operator");
     }

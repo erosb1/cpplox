@@ -10,7 +10,7 @@
 
 int main() {
     std::string source_code = R"(
-        !false;
+        45 == 3;
     )";
     Parser parser(source_code);
     auto ast = parser.GenerateAST();

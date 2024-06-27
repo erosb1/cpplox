@@ -14,6 +14,9 @@ enum class OpCode {
     POP,
     NEGATE,
     NOT,
+    EQUAL,
+    GREATER,
+    LESS,
 };
 
 using OP = OpCode;
@@ -32,6 +35,9 @@ const inline std::unordered_map<OP, OpDefinition> OP_DEFINITIONS = {
     {OP::POP, {"POP", 0}},
     {OP::NEGATE, {"NEGATE", 0}},
     {OP::NOT, {"NOT", 0}},
+    {OP::EQUAL, {"EQUAL", 0}},
+    {OP::GREATER, {"GREATER", 0}},
+    {OP::LESS, {"LESS", 0}},
 };
 
 class Chunk {
