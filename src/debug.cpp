@@ -1,5 +1,6 @@
 #include "debug.h"
 #include <iomanip>
+#include <format>
 
 constexpr size_t AST_INDENT_SPACING = 4;
 
@@ -46,18 +47,22 @@ static std::string GetTokenString(TokenType type) {
     }
 }
 
-std::string Debug::VariantToString(const Value& var) {
-    return std::visit([&](auto&& arg) -> std::string {
-        using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, std::string_view>) {
-            return std::string(arg);
-        } else if constexpr (std::is_same_v<T, double>) {
-            return std::to_string(arg);
-        } else if constexpr (std::is_same_v<T, bool>) {
-            if (std::get<bool>(var) == true) return "true";
-            return "false";
-        } else return "nil";
-    }, var);
+std::string Debug::VariantToString(Value var) {
+    if (std::holds_alternative<std::string_view>(var)) {
+        return std::string(std::get<std::string_view>(var));
+    }
+    if (std::holds_alternative<double>(var)) {
+        const auto val = std::get<double>(var);
+        std::ostringstream oss;
+        oss.precision(2);
+        oss << std::fixed << val;
+        return oss.str();
+    }
+    if (std::holds_alternative<bool>(var)) {
+        const auto val = std::get<bool>(var);
+        return val ? "true" : "false";
+    }
+    return "nil";
 }
 
 std::ostream& operator<<(std::ostream& os, const TokenType& type) {
@@ -301,8 +306,9 @@ std::string Debug::GetChunkStr(const Chunk &chunk) {
 
         if (op_definition.operand_count > 0) {
             auto operand = static_cast<int>(code[++i]);
-            oss << operand << "\n";
+            oss << operand;
         }
+        oss << "\n";
     }
     return oss.str();
 }

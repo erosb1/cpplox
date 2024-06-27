@@ -42,7 +42,7 @@ namespace Debug {
     std::string GetChunkStr(const Chunk& chunk);
     std::string GetASTString(ASTNode* head);
     std::string GetExpressionStr(const Expression* expression);
-    std::string VariantToString(const Value& val);
+    std::string VariantToString(Value val);
 }
 
 // Used for printing TokenTypes in unit tests

@@ -31,26 +31,26 @@ void VM::Interpret(const Chunk &chunk) {
                 PushStack(constant);
             } break;
             case OP::ADD: {
-                Value left = PopStack();
                 Value right = PopStack();
+                Value left = PopStack();
                 Value sum = Add(left, right);
                 PushStack(sum);
             } break;
             case OP::SUBTRACT: {
-                Value left = PopStack();
                 Value right = PopStack();
+                Value left = PopStack();
                 Value difference = Subtract(left, right);
                 PushStack(difference);
             } break;
             case OP::MULTIPLY: {
-                Value left = PopStack();
                 Value right = PopStack();
+                Value left = PopStack();
                 Value product = Multiply(left, right);
                 PushStack(product);
             } break;
             case OP::DIVIDE: {
-                Value left = PopStack();
                 Value right = PopStack();
+                Value left = PopStack();
                 Value quotient = Divide(left, right);
                 PushStack(quotient);
             } break;
