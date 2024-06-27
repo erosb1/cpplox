@@ -57,6 +57,7 @@ void VM::Interpret(const Chunk &chunk) {
             default:
                 Error("Invalid OPCODE");
         }
+        if (HasDebugLogger() && stack_has_changed_) PrintStack();
     }
 }
 
@@ -79,24 +80,23 @@ Value VM::PopStack() {
         return {};
     }
     stack_has_changed_ = true;
-    return stack_[sp_--];
+    return stack_[--sp_];
 }
 
-Value VM::StackTop() {
+Value VM::StackTop() const {
     if (stack_.empty()) {
         Error("Stack is empty");
         return {};
     }
-    return stack_[sp_--];
+    return stack_[sp_];
 }
 
-void VM::Error(std::string msg) {
+void VM::Error(std::string msg) const {
     error_logger_.Log("[RUNTIME ERROR]" + msg);
 }
 
-void VM::PrintStatus(OP op_code, std::optional<uint8_t> operand) {
+void VM::PrintStatus(OP op_code, std::optional<uint8_t> operand) const {
     assert(debug_logger_.has_value());
-    if (stack_has_changed_) PrintStack();
     auto& op_name = OP_DEFINITIONS.at(op_code).name;
     std::string temp = "[" + op_name + "]";
     *debug_logger_ << std::left << std::setw(12) << temp;
@@ -107,7 +107,7 @@ void VM::PrintStatus(OP op_code, std::optional<uint8_t> operand) {
     *debug_logger_ << "\n";
 }
 
-void VM::PrintStack() {
+void VM::PrintStack() const {
     assert(debug_logger_.has_value());
     *debug_logger_ << "Stack: [";
     for (int i = 0; i < sp_; i++) {
@@ -118,7 +118,7 @@ void VM::PrintStack() {
     stack_has_changed_ = false;
 }
 
-void VM::PrintChunkDebugInfo(const Chunk& chunk) {
+void VM::PrintChunkDebugInfo(const Chunk& chunk) const {
     assert(debug_logger_.has_value());
     *debug_logger_ << "VM DEBUG INFO\nConstants: [";
     auto constants = chunk.GetConstants();
