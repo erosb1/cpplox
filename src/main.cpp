@@ -10,7 +10,7 @@
 
 int main() {
     std::string source_code = R"(
-        45 == 3;
+        1 + 2 + 3 == 3 - 2 - 1;
     )";
     Parser parser(source_code);
     auto ast = parser.GenerateAST();
@@ -20,10 +20,10 @@ int main() {
     Compiler compiler;
     Chunk chunk = compiler.Compile(ast.get());
     std::cout << Debug::GetChunkStr(chunk) << std::endl << std::endl << std::endl;
-    VM vm;
+    VM vm(chunk);
     Logger logger(LogLevel::DEBUG);
     vm.SetDebug(std::move(logger));
-    vm.Interpret(chunk);
+    vm.Interpret();
 
     //Debug::ASTStringVisitor debug;
     //ast->accept(debug);

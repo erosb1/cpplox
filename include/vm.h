@@ -9,25 +9,28 @@
 
 class VM {
 public:
-    VM();
-    void Interpret(const Chunk& chunk);
+    VM(const Chunk& chunk);
+    void Interpret();
     void SetDebug(Logger logger);
 private:
+    bool InterpretNext();
     void PushStack(Value val);
     Value PopStack();
     Value StackTop() const;
     void Error(std::string msg) const;
+    OP NextInstruction();
 
     // Used for debugging, prints an opcode and potential operand to debug logger
-    void PrintStatus(OP cur_instruction, std::optional<uint8_t> operand = std::nullopt) const;
+    void PrintStatus() const;
     void PrintStack() const;
-    void PrintChunkDebugInfo(const Chunk& chunk) const;
+    void PrintChunkDebugInfo() const;
     [[nodiscard]] bool HasDebugLogger() const;
 private:
+    const Chunk& chunk_;
+    int pc_;
     static constexpr int MAX_STACK_SIZE_ = 2048;
     std::array<Value, MAX_STACK_SIZE_> stack_;
     int sp_;
-    mutable bool had_error_; // TODO should not be mutable bad design
 
     // Debug variables, not part of the VM logic
     mutable bool stack_has_changed_;

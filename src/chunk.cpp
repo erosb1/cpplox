@@ -16,3 +16,7 @@ const std::vector<uint8_t>& Chunk::GetCode() const {
 const std::vector<Value> & Chunk::GetConstants() const {
     return constants_;
 }
+
+size_t Chunk::Size() const {
+    return code_.size();
+}

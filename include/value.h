@@ -67,6 +67,10 @@ struct Value {
     [[nodiscard]] bool IsFalsey() const {
         return IsNil() || (IsBool() && !AsBool());
     }
+
+    [[nodiscard]] bool IsTruthy() const {
+        return !IsFalsey();
+    }
 private:
     InternalVal val_;
 };

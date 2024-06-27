@@ -17,6 +17,8 @@ enum class OpCode {
     EQUAL,
     GREATER,
     LESS,
+    JUMP,
+    JUMP_IF_FALSE,
 };
 
 using OP = OpCode;
@@ -38,6 +40,8 @@ const inline std::unordered_map<OP, OpDefinition> OP_DEFINITIONS = {
     {OP::EQUAL, {"EQUAL", 0}},
     {OP::GREATER, {"GREATER", 0}},
     {OP::LESS, {"LESS", 0}},
+    {OP::JUMP, {"JUMP", 2}},
+    {OP::JUMP_IF_FALSE, {"JUMP_IF_FALSE", 2}},
 };
 
 class Chunk {
@@ -46,6 +50,7 @@ public:
     uint8_t AddConstant(Value constant);
     [[nodiscard]] const std::vector<uint8_t>& GetCode() const; // for debug printing
     [[nodiscard]] const std::vector<Value>& GetConstants() const;
+    [[nodiscard]] size_t Size() const;
 private:
     std::vector<uint8_t> code_;
     std::vector<Value> constants_;
