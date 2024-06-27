@@ -2,21 +2,31 @@
 #include <iomanip>
 
 #include "vm.h"
+#include "debug.h"
 
-#include <boost/test/tools/collection_comparison_op.hpp>
+#include <cassert>
 
 VM::VM()
     : sp_(0)
-{}
+    , stack_has_changed_(false) {
+    Logger error_logger(LogLevel::ERROR);
+    error_logger_ = std::move(error_logger_);
+}
 
-void VM::Interpret(const Chunk &chunk, bool debug) {
+void VM::Interpret(const Chunk &chunk) {
+    if (HasDebugLogger()) PrintChunkDebugInfo(chunk);
     auto& code = chunk.GetCode();
     for (int i = 0; i < code.size(); i++) {
         auto op_code = static_cast<OP>(code[i]);
-        if (debug) PrintStatus(op_code);
+        if (HasDebugLogger()) {
+            // Check if op_code has any operands, and then also print them
+            if (OP_DEFINITIONS.at(op_code).operand_count == 1) PrintStatus(op_code, code[i+1]);
+            // otherwise just print current op_code
+            else PrintStatus(op_code);
+        }
         switch (op_code) {
             case OP::CONSTANT: {
-                uint8_t index = code[i++];
+                uint8_t index = code[++i];
                 Value constant = chunk.GetConstants().at(index);
                 PushStack(constant);
             } break;
@@ -50,12 +60,17 @@ void VM::Interpret(const Chunk &chunk, bool debug) {
     }
 }
 
+void VM::SetDebug(Logger logger) {
+    debug_logger_ = std::move(logger);
+}
+
 void VM::PushStack(Value val) {
-    if (stack_.size() >= stack_size_) {
+    if (sp_ >= MAX_STACK_SIZE_) {
         Error("Stack Overflow");
         return;
     }
     stack_[sp_++] = val;
+    stack_has_changed_ = true;
 }
 
 Value VM::PopStack() {
@@ -63,6 +78,7 @@ Value VM::PopStack() {
         Error("Stack is empty");
         return {};
     }
+    stack_has_changed_ = true;
     return stack_[sp_--];
 }
 
@@ -75,18 +91,46 @@ Value VM::StackTop() {
 }
 
 void VM::Error(std::string msg) {
-    std::cerr << "[RUNTIME ERROR]: " << msg;
+    error_logger_.Log("[RUNTIME ERROR]" + msg);
 }
 
-void VM::PrintStatus(OP op_code) {
-    auto& op_definition = OP_DEFINITIONS.at(op_code);
-    std::string temp = "[" + op_definition.name + "]";
-    std::cout << std::left << std::setw(12) << temp;
+void VM::PrintStatus(OP op_code, std::optional<uint8_t> operand) {
+    assert(debug_logger_.has_value());
+    if (stack_has_changed_) PrintStack();
+    auto& op_name = OP_DEFINITIONS.at(op_code).name;
+    std::string temp = "[" + op_name + "]";
+    *debug_logger_ << std::left << std::setw(12) << temp;
 
-    if (op_definition.operand_count > 0) {
-        auto operand = static_cast<int>(code[++i]);
-        oss << operand << "\n";
+    if (operand.has_value()) {
+        *debug_logger_ << static_cast<int>(*operand);
     }
+    *debug_logger_ << "\n";
+}
+
+void VM::PrintStack() {
+    assert(debug_logger_.has_value());
+    *debug_logger_ << "Stack: [";
+    for (int i = 0; i < sp_; i++) {
+        *debug_logger_ << Debug::VariantToString(stack_[i]);
+        if (i+1 != sp_) *debug_logger_ << ", ";
+    }
+    *debug_logger_ << "]\n";
+    stack_has_changed_ = false;
+}
+
+void VM::PrintChunkDebugInfo(const Chunk& chunk) {
+    assert(debug_logger_.has_value());
+    *debug_logger_ << "VM DEBUG INFO\nConstants: [";
+    auto constants = chunk.GetConstants();
+    for (int i = 0; i < constants.size(); i++) {
+        *debug_logger_ << Debug::VariantToString(constants[i]);
+        if (i+1 != constants.size()) *debug_logger_ << ", ";
+    }
+    *debug_logger_ << "]\n\n";
+}
+
+bool VM::HasDebugLogger() const {
+    return debug_logger_.has_value();
 }
 
 Value VM::Add(Value left, Value right) {

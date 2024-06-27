@@ -46,7 +46,7 @@ static std::string GetTokenString(TokenType type) {
     }
 }
 
-static std::string VariantToString(const Value& var) {
+std::string Debug::VariantToString(const Value& var) {
     return std::visit([&](auto&& arg) -> std::string {
         using T = std::decay_t<decltype(arg)>;
         if constexpr (std::is_same_v<T, std::string_view>) {
@@ -374,7 +374,7 @@ static std::string WrapWithParen(std::string str) {
 
 static std::string CreateExprString(const Expression* const expression) {
     if (const auto* literal = dynamic_cast<const Literal*>(expression)) {
-        return VariantToString(literal->value);
+        return Debug::VariantToString(literal->value);
     }
     if (const auto* identifier = dynamic_cast<const Identifier*>(expression)) {
         return std::string(identifier->name);

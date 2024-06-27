@@ -4,10 +4,17 @@
 
 #include "logger.h"
 
+Logger::Logger()
+    : level_(LogLevel::DEBUG)
+{
+    SetOutputType(LogOutput::STDOUT);
+}
+
 Logger::Logger(LogLevel level)
     : level_(level)
-    , out_(std::make_unique<std::ostream>(std::cout.rdbuf()))
-{}
+{
+    SetOutputType(LogOutput::STDOUT);
+}
 
 void Logger::Log(std::string msg) {
     *(out_) << msg << std::endl;
@@ -16,7 +23,11 @@ void Logger::Log(std::string msg) {
 void Logger::SetOutputType(LogOutput output_type, std::string filename) {
     switch (output_type) {
         case LogOutput::STDOUT:
-            out_ = std::make_unique<std::ostream>(std::cout.rdbuf());
+            if (level_ == LogLevel::ERROR) {
+                out_ = std::make_unique<std::ostream>(std::cerr.rdbuf());
+            } else {
+                out_ = std::make_unique<std::ostream>(std::cout.rdbuf());
+            }
             break;
         case LogOutput::FILE:
             if (filename.empty()) {
@@ -28,6 +39,10 @@ void Logger::SetOutputType(LogOutput output_type, std::string filename) {
             out_ = std::make_unique<std::ostringstream>();
             break;
     }
+}
+
+void Logger::SetLogLevel(LogLevel log_level) {
+    level_ = log_level;
 }
 
 std::string Logger::GetOutputString() {
