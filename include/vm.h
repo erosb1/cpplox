@@ -27,6 +27,7 @@ private:
     static constexpr int MAX_STACK_SIZE_ = 2048;
     std::array<Value, MAX_STACK_SIZE_> stack_;
     int sp_;
+    mutable bool had_error_; // TODO should not be mutable bad design
 
     // Debug variables, not part of the VM logic
     mutable bool stack_has_changed_;

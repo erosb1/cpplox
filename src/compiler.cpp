@@ -67,12 +67,18 @@ void Compiler::visit(Binary &node) {
         case TT::STAR: Emit(OP::MULTIPLY); break;
         case TT::SLASH: Emit(OP::DIVIDE); break;
         default:
-            throw "no";
+            throw std::invalid_argument("Invalid binary operator");
     }
 }
 
 void Compiler::visit(Unary &node) {
     node.expression->accept(*this);
+    switch (node.op) {
+        case TT::MINUS: Emit(OP::NEGATE); break;
+        case TT::BANG: Emit(OP::NOT); break;
+        default:
+            throw std::invalid_argument("Invalid unary operator");
+    }
 }
 
 void Compiler::visit(Call &node) {

@@ -8,7 +8,8 @@
 
 VM::VM()
     : sp_(0)
-    , stack_has_changed_(false) {
+    , stack_has_changed_(false)
+    , had_error_(false) {
     Logger error_logger(LogLevel::ERROR);
     error_logger_ = std::move(error_logger_);
 }
@@ -16,7 +17,7 @@ VM::VM()
 void VM::Interpret(const Chunk &chunk) {
     if (HasDebugLogger()) PrintChunkDebugInfo(chunk);
     auto& code = chunk.GetCode();
-    for (int i = 0; i < code.size(); i++) {
+    for (int i = 0; i < code.size() && !had_error_; i++) {
         auto op_code = static_cast<OP>(code[i]);
         if (HasDebugLogger()) {
             // Check if op_code has any operands, and then also print them
@@ -77,6 +78,20 @@ void VM::Interpret(const Chunk &chunk) {
             case OP::POP: {
                 PopStack();
             } break;
+            case OP::NEGATE: {
+                Value val = PopStack();
+                if (val.IsDouble()) {
+                    Value negated = -(val.AsDouble());
+                    PushStack(negated);
+                } else {
+                    Error("Cannot perform negation. Invalid type: " + val.GetTypeDebugString());
+                }
+            } break;
+            case OP::NOT: {
+                Value val = PopStack();
+                if (val.IsFalsey()) PushStack(true);
+                else PushStack(false);
+            } break;
             default:
                 Error("Invalid OPCODE");
         }
@@ -116,6 +131,7 @@ Value VM::StackTop() const {
 
 void VM::Error(std::string msg) const {
     error_logger_.Log("[RUNTIME ERROR]" + msg);
+    had_error_ = true;
 }
 
 void VM::PrintStatus(OP op_code, std::optional<uint8_t> operand) const {

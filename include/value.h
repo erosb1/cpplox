@@ -63,6 +63,10 @@ struct Value {
         if (IsString()) return "string";
         return "nil";
     }
+
+    [[nodiscard]] bool IsFalsey() const {
+        return IsNil() || (IsBool() && !AsBool());
+    }
 private:
     InternalVal val_;
 };

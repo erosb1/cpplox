@@ -25,6 +25,7 @@ Parser::Parser(std::string_view source_code)
     pratt_table_[TT::NIL]           = {parseLiteral, nullptr, Precedence::NONE};
     pratt_table_[TT::STRING]        = {parseLiteral, nullptr, Precedence::NONE};
     pratt_table_[TT::NUMBER]        = {parseLiteral, nullptr, Precedence::NONE};
+    pratt_table_[TT::BANG]          = {parseUnary, nullptr, Precedence::NONE};
     pratt_table_[TT::IDENTIFIER]    = {parseIdentifier, nullptr, Precedence::NONE};
     pratt_table_[TT::EQUAL]         = {nullptr, parseAssignment, Precedence::ASSIGNMENT};
     pratt_table_[TT::OR]            = {nullptr, parseBinary, Precedence::OR};
