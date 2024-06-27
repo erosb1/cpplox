@@ -34,7 +34,7 @@ bool VM::InterpretNext() {
     auto op_code = NextInstruction();
     switch (op_code) {
         case OP::CONSTANT: {
-            auto index = static_cast<size_t>(NextInstruction()); // Consumes the Operand
+            auto index = ConsumeOperand();
             Value constant = chunk_.GetConstants().at(index);
             PushStack(constant);
         } break;
@@ -164,6 +164,15 @@ Value VM::StackTop() const {
     return stack_[sp_];
 }
 
+uint64_t VM::ConsumeOperand(int operand_count) {
+    uint64_t combined = 0;
+    for (int i = 0; i < operand_count; i++) {
+        auto operand = NextInstruction();
+        combined |= static_cast<uint64_t>(operand) << (8 * i);
+    }
+    return combined;
+}
+
 void VM::Error(std::string msg) const {
     error_logger_.Log("[RUNTIME ERROR]" + msg);
 }
@@ -191,7 +200,7 @@ void VM::PrintStatus() const {
     // Print operands (convert all operands into one uint64_t)
     auto operand_count = OP_DEFINITIONS.at(cur_instruction).operand_count;
     uint64_t combined = 0;
-    for (int i = 0; i < operand_count; i++) {  // Start i from 0
+    for (int i = 0; i < operand_count; i++) {
         uint8_t operand = code.at(pc_ + i + 1);
         combined |= static_cast<uint64_t>(operand) << (8 * i);
     }

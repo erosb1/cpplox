@@ -17,6 +17,7 @@ private:
     void PushStack(Value val);
     Value PopStack();
     Value StackTop() const;
+    uint64_t ConsumeOperand(int operand_size = 1);
     void Error(std::string msg) const;
     OP NextInstruction();
 
