@@ -54,6 +54,9 @@ void VM::Interpret(const Chunk &chunk) {
                 Value quotient = Divide(left, right);
                 PushStack(quotient);
             } break;
+            case OP::POP: {
+                PopStack();
+            } break;
             default:
                 Error("Invalid OPCODE");
         }

@@ -11,6 +11,7 @@ enum class OpCode {
     SUBTRACT,
     MULTIPLY,
     DIVIDE,
+    POP,
 };
 
 using OP = OpCode;
@@ -26,6 +27,7 @@ const inline std::unordered_map<OP, OpDefinition> OP_DEFINITIONS = {
     {OP::SUBTRACT, {"SUBTRACT", 0}},
     {OP::MULTIPLY, {"MULTIPLY", 0}},
     {OP::DIVIDE, {"DIVIDE", 0}},
+    {OP::POP, {"POP", 0}},
 };
 
 class Chunk {

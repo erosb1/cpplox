@@ -24,6 +24,7 @@ void Compiler::visit(VarDecl &node) {
 
 void Compiler::visit(ExprStmt &node) {
     node.expression->accept(*this);
+    Emit(OP::POP);
 }
 
 void Compiler::visit(IfStmt &node) {
