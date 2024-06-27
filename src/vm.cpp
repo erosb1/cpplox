@@ -31,28 +31,48 @@ void VM::Interpret(const Chunk &chunk) {
                 PushStack(constant);
             } break;
             case OP::ADD: {
+                // TODO implement string concatenation
                 Value right = PopStack();
                 Value left = PopStack();
-                Value sum = Add(left, right);
-                PushStack(sum);
+                if (left.IsDouble() && right.IsDouble()) {
+                    Value sum = left.AsDouble() + right.AsDouble();
+                    PushStack(sum);
+                } else {
+                    Error("Cannot perform addition. Invalid types: " + left.GetTypeDebugString() + " and " + right.GetTypeDebugString());
+                }
             } break;
             case OP::SUBTRACT: {
                 Value right = PopStack();
                 Value left = PopStack();
-                Value difference = Subtract(left, right);
-                PushStack(difference);
+                if (left.IsDouble() && right.IsDouble()) {
+                    Value difference = left.AsDouble() - right.AsDouble();
+                    PushStack(difference);
+                } else {
+                    Error("Cannot perform subtraction. Invalid types: " + left.GetTypeDebugString() + " and " + right.GetTypeDebugString());
+                }
             } break;
             case OP::MULTIPLY: {
                 Value right = PopStack();
                 Value left = PopStack();
-                Value product = Multiply(left, right);
-                PushStack(product);
+                if (left.IsDouble() && right.IsDouble()) {
+                    Value product = left.AsDouble() * right.AsDouble();
+                    PushStack(product);
+                } else {
+                    Error("Cannot perform multiplication. Invalid types: " + left.GetTypeDebugString() + " and " + right.GetTypeDebugString());
+                }
             } break;
             case OP::DIVIDE: {
                 Value right = PopStack();
                 Value left = PopStack();
-                Value quotient = Divide(left, right);
-                PushStack(quotient);
+                if (left.IsDouble() && right.IsDouble()) {
+                    if (right.AsDouble() == 0.0) Error("Tried to divide by 0");
+                    else {
+                        Value quotient = left.AsDouble() / right.AsDouble();
+                        PushStack(quotient);
+                    }
+                } else {
+                    Error("Cannot perform division. Invalid types: " + left.GetTypeDebugString() + " and " + right.GetTypeDebugString());
+                }
             } break;
             case OP::POP: {
                 PopStack();
@@ -134,48 +154,4 @@ void VM::PrintChunkDebugInfo(const Chunk& chunk) const {
 
 bool VM::HasDebugLogger() const {
     return debug_logger_.has_value();
-}
-
-Value VM::Add(Value left, Value right) {
-    if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
-        Value sum = std::get<double>(left) + std::get<double>(right);
-        return sum;
-    }
-    // TODO string concatenation and string intering
-    //if (std::holds_alternative<std::string_view>(left) && std::holds_alternative<std::string_view>(right)) {
-    //    std::string
-    //}
-    Error("Mismatched types, cannot perform addition");
-    return {};
-}
-
-Value VM::Subtract(Value left, Value right) {
-    if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
-        Value difference = std::get<double>(left) - std::get<double>(right);
-        return difference;
-    }
-    Error("Mismatched types, cannot perform subtraction");
-    return {};
-}
-
-Value VM::Multiply(Value left, Value right) {
-    if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
-        Value product = std::get<double>(left) * std::get<double>(right);
-        return product;
-    }
-    Error("Mismatched types, cannot perform multiplication");
-    return {};
-}
-
-Value VM::Divide(Value left, Value right) {
-    if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
-        if (std::get<double>(right) == 0.0) {
-            Error("Tried to divide by 0");
-            return {};
-        }
-        Value quotient = std::get<double>(left) / std::get<double>(right);
-        return quotient;
-    }
-    Error("Mismatched types, cannot perform division");
-    return {};
 }

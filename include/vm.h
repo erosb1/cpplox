@@ -23,11 +23,6 @@ private:
     void PrintStack() const;
     void PrintChunkDebugInfo(const Chunk& chunk) const;
     [[nodiscard]] bool HasDebugLogger() const;
-
-    Value Add(Value left, Value right);
-    Value Subtract(Value left, Value right);
-    Value Multiply(Value left, Value right);
-    Value Divide(Value left, Value right);
 private:
     static constexpr int MAX_STACK_SIZE_ = 2048;
     std::array<Value, MAX_STACK_SIZE_> stack_;

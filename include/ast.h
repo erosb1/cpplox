@@ -7,7 +7,7 @@
 #include <string>
 #include <variant>
 
-#include "ast.h"
+#include "value.h"
 #include "lexer.h"
 
 class ASTNode;
@@ -194,7 +194,6 @@ public:
 };
 
 // Using string_view for literal strings. The actual string will be a substring of the source code
-using Value = std::variant<double, bool, std::string_view, std::monostate>;
 class Literal : public Expression {
 public:
     Value value{};

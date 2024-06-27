@@ -16,14 +16,17 @@ int main() {
     auto ast = parser.GenerateAST();
     SemanticAnalyser analyser;
     ast->accept(analyser);
-    Compiler compiler;
-    Chunk chunk = compiler.Compile(ast.get());
-    std::cout << Debug::GetChunkStr(chunk) << std::endl << std::endl << std::endl;
 
-    VM vm;
-    Logger logger(LogLevel::DEBUG);
-    vm.SetDebug(std::move(logger));
-    vm.Interpret(chunk);
+
+
+
+    //Compiler compiler;
+    //Chunk chunk = compiler.Compile(ast.get());
+    //std::cout << Debug::GetChunkStr(chunk) << std::endl << std::endl << std::endl;
+    //VM vm;
+    //Logger logger(LogLevel::DEBUG);
+    //vm.SetDebug(std::move(logger));
+    //vm.Interpret(chunk);
 
     //Debug::ASTStringVisitor debug;
     //ast->accept(debug);

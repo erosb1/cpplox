@@ -48,20 +48,20 @@ static std::string GetTokenString(TokenType type) {
 }
 
 std::string Debug::VariantToString(Value var) {
-    if (std::holds_alternative<std::string_view>(var)) {
-        return std::string(std::get<std::string_view>(var));
-    }
-    if (std::holds_alternative<double>(var)) {
-        const auto val = std::get<double>(var);
-        std::ostringstream oss;
-        oss.precision(2);
-        oss << std::fixed << val;
-        return oss.str();
-    }
-    if (std::holds_alternative<bool>(var)) {
-        const auto val = std::get<bool>(var);
-        return val ? "true" : "false";
-    }
+    //if (std::holds_alternative<std::string_view>(var)) {
+    //    return std::string(std::get<std::string_view>(var));
+    //}
+    //if (std::holds_alternative<double>(var)) {
+    //    const auto val = std::get<double>(var);
+    //    std::ostringstream oss;
+    //    oss.precision(2);
+    //    oss << std::fixed << val;
+    //    return oss.str();
+    //}
+    //if (std::holds_alternative<bool>(var)) {
+    //    const auto val = std::get<bool>(var);
+    //    return val ? "true" : "false";
+    //}
     return "nil";
 }
 
