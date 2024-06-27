@@ -134,7 +134,7 @@ void VM::PrintStack() const {
     assert(debug_logger_.has_value());
     *debug_logger_ << "Stack: [";
     for (int i = 0; i < sp_; i++) {
-        *debug_logger_ << Debug::VariantToString(stack_[i]);
+        *debug_logger_ << stack_[i].GetValueDebugString();
         if (i+1 != sp_) *debug_logger_ << ", ";
     }
     *debug_logger_ << "]\n";
@@ -144,9 +144,9 @@ void VM::PrintStack() const {
 void VM::PrintChunkDebugInfo(const Chunk& chunk) const {
     assert(debug_logger_.has_value());
     *debug_logger_ << "VM DEBUG INFO\nConstants: [";
-    auto constants = chunk.GetConstants();
+    auto& constants = chunk.GetConstants();
     for (int i = 0; i < constants.size(); i++) {
-        *debug_logger_ << Debug::VariantToString(constants[i]);
+        *debug_logger_ << constants[i].GetValueDebugString();
         if (i+1 != constants.size()) *debug_logger_ << ", ";
     }
     *debug_logger_ << "]\n\n";

@@ -250,7 +250,7 @@ void Debug::ASTStringVisitor::visit(Identifier &node) {
 }
 
 void Debug::ASTStringVisitor::visit(Literal &node) {
-    oss_ << "Literal { value: " << VariantToString(node.value) << " },\n";
+    oss_ << "Literal { value: " << node.value.GetValueDebugString() << " },\n";
 }
 
 void Debug::ASTStringVisitor::visit(Parameters &node) {
