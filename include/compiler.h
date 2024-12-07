@@ -27,6 +27,7 @@ public:
     void visit(Arguments &node) override;
 private:
     void Emit(OpCode op_code);
+    uint32_t EmitJump(OpCode jump_type);
     void EmitWithOperand(OpCode op_code, uint8_t operand);
 private:
     Chunk cur_chunk_;

@@ -29,6 +29,7 @@ void Compiler::visit(ExprStmt &node) {
 
 void Compiler::visit(IfStmt &node) {
     node.condition->accept(*this);
+    EmitJump(OP::JUMP_IF_FALSE);
     node.if_body->accept(*this);
     if (node.else_body != nullptr) node.else_body->accept(*this);
 }
@@ -113,6 +114,14 @@ void Compiler::visit(Arguments &node) {
 void Compiler::Emit(OpCode op_code) {
     auto byte = static_cast<uint8_t>(op_code);
     cur_chunk_.Write(byte);
+}
+
+uint32_t Compiler::EmitJump(OpCode jump_type) {
+    assert(jump_type == OP::JUMP || jump_type == OP::JUMP_IF_FALSE);
+    Emit(jump_type);
+    cur_chunk_.Write(0xff); // Write Garbage for now, since we don't know where to jump yet.
+    cur_chunk_.Write(0xff);
+    return cur_chunk_.Size();
 }
 
 void Compiler::EmitWithOperand(OpCode op_code, uint8_t operand) {
